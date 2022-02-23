@@ -1,0 +1,98 @@
+.login {
+  position: relative;
+
+  &__logo {
+    width: 15rem;
+    height: 10rem;
+    margin-left: 3rem;
+
+    display: flex;
+    align-self: start;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &--header {
+      font-size: 6rem;
+      margin-bottom: 2rem;
+      font-family: "Poppins", sans-serif;
+      font-weight: 600;
+    }
+
+    &--label {
+      display: block;
+      text-align: left;
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #37352f99;
+    }
+
+    &--input {
+      font-size: 1.4rem;
+      padding: 5px 10px;
+      border-radius: 3px;
+      background-color: #f5f5f5;
+      height: 3rem;
+      width: 30rem;
+      margin-bottom: 1rem;
+      border: none;
+      box-shadow: rgb(15 15 15 / 10%) 0px 0px 0px 1px inset;
+
+      &:focus {
+        box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+        outline: none;
+      }
+    }
+
+    &--btn {
+      font-size: 1.4rem;
+      font-weight: 600;
+      width: 32rem;
+      height: 4rem;
+      background-color: #fdf5f2;
+      border-radius: 3px;
+      margin-top: 1rem;
+      cursor: pointer;
+      color: #eb7575;
+      border: none;
+      box-shadow: rgb(15 15 15 / 10%) 0px 1px 2px,
+        rgb(235 87 87 / 30%) 0px 0px 0px 1px inset;
+      transition: all 0.3s;
+
+      &:hover {
+        background-color: #f8f8f8;
+      }
+    }
+
+    &--link {
+      margin-top: 2rem;
+      font-size: 1.4rem;
+
+      &-p {
+        text-decoration: underline;
+        color: grey;
+        cursor: pointer;
+        transition: all 0.5s;
+        display: inline;
+
+        &:hover {
+          color: rgb(235, 87, 87);
+        }
+      }
+
+      &-a {
+        transition: all 0.5s;
+        color: grey;
+
+        &:hover {
+          color: rgb(235, 87, 87);
+        }
+      }
+    }
+  }
+}
