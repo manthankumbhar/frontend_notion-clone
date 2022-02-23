@@ -18,7 +18,7 @@ export default function Signup() {
     setLoading(true);
     e.preventDefault();
     axios
-      .post("https://backend-notion-clone.herokuapp.com/signup", {
+      .post(`${process.env.REACT_APP_SERVER_LINK}/signup`, {
         email: email,
         password: password,
       })

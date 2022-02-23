@@ -20,7 +20,7 @@ export default function Login(props) {
     setLoading(true);
     e.preventDefault();
     axios
-      .post("https://backend-notion-clone.herokuapp.com/reset-password", {
+      .post(`${process.env.REACT_APP_SERVER_LINK}/reset-password`, {
         email: email,
       })
       .then((res) => {
@@ -43,7 +43,7 @@ export default function Login(props) {
     setLoading(true);
     e.preventDefault();
     axios
-      .post("https://backend-notion-clone.herokuapp.com/signin", {
+      .post(`${process.env.REACT_APP_SERVER_LINK}/signin`, {
         email: email,
         password: password,
       })
