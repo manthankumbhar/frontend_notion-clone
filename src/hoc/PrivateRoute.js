@@ -11,7 +11,7 @@ function CheckToken(accessToken, refreshToken) {
     return true;
   } else if (isRefreshTokenExpired === false) {
     axios
-      .post("https://backend-notion-clone.herokuapp.com/refresh-tokens", {
+      .post(`${process.env.REACT_APP_SERVER_LINK}/refresh-token`, {
         refreshToken: refreshToken,
       })
       .then((res) => {
@@ -39,14 +39,24 @@ function PrivateRoute({ Component, ...rest }) {
     CheckToken(localStorage.accessToken, localStorage.refreshToken) ? (
       <Outlet />
     ) : (
+      <div>
+        <p style={{ fontSize: "35px", fontWeight: "900" }}>
+          404 <br /> Page not found
+        </p>
+        <a style={{ fontSize: "20px" }} href="/">
+          Go to home
+        </a>
+      </div>
+    )
+  ) : (
+    <div>
       <p style={{ fontSize: "35px", fontWeight: "900" }}>
         404 <br /> Page not found
       </p>
-    )
-  ) : (
-    <p style={{ fontSize: "35px", fontWeight: "900" }}>
-      404 <br /> Page not found
-    </p>
+      <a style={{ fontSize: "20px" }} href="/">
+        Go to home
+      </a>
+    </div>
   );
 }
 

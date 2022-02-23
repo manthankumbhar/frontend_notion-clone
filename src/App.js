@@ -17,9 +17,14 @@ export default function App() {
         <Route
           path="*"
           element={
-            <p style={{ fontSize: "35px", fontWeight: "900" }}>
-              404 <br /> Page not found
-            </p>
+            <div>
+              <p style={{ fontSize: "35px", fontWeight: "900" }}>
+                404 <br /> Page not found
+              </p>
+              <a style={{ fontSize: "20px" }} href="/">
+                Go to home
+              </a>
+            </div>
           }
         />
       </Routes>
