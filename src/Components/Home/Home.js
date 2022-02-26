@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import auth from "../../hoc/auth";
@@ -8,14 +8,14 @@ import "./Home.scss";
 
 export default function Home() {
   const navigate = useNavigate();
-  const logout = (e) => {
-    e.preventDefault();
+  const logout = useCallback(() => {
     auth.logout(() => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       navigate("/");
     });
-  };
+  }, [navigate]);
+
   return (
     <div className="home">
       <Link to="/" className="login__logo">

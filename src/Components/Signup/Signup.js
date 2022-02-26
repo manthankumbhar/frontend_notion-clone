@@ -10,7 +10,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +33,7 @@ export default function Signup() {
         }
       })
       .catch((err) => {
-        setOpen(true);
+        setOpenSnackbar(true);
         setSnackbarMessage(err.response.data["error"]);
         setLoading(false);
       });
@@ -43,14 +43,14 @@ export default function Signup() {
     if (reason === "clickaway") {
       return;
     }
-    setOpen(false);
+    setOpenSnackbar(false);
   };
 
   return (
     <div className="signup">
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={open}
+        openSnackbar={openSnackbar}
         autoHideDuration={4000}
         onClose={handleClose}
       >

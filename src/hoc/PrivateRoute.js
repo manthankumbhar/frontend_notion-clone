@@ -3,6 +3,7 @@ import { isExpired } from "react-jwt";
 import { Outlet } from "react-router";
 import auth from "./auth";
 import axios from "axios";
+import Error from "../Components/Error/Error";
 
 function CheckToken(accessToken, refreshToken) {
   var isAccessTokenExpired = isExpired(accessToken);
@@ -33,31 +34,17 @@ function CheckToken(accessToken, refreshToken) {
 
 function PrivateRoute({ Component, ...rest }) {
   const isAuth = auth.isAuthenticated();
-  return isAuth ? (
-    <Outlet />
-  ) : localStorage.accessToken && localStorage.refreshToken ? (
-    CheckToken(localStorage.accessToken, localStorage.refreshToken) ? (
-      <Outlet />
-    ) : (
-      <div>
-        <p style={{ fontSize: "35px", fontWeight: "900" }}>
-          404 <br /> Page not found
-        </p>
-        <a style={{ fontSize: "20px" }} href="/">
-          Go to home
-        </a>
-      </div>
-    )
-  ) : (
-    <div>
-      <p style={{ fontSize: "35px", fontWeight: "900" }}>
-        404 <br /> Page not found
-      </p>
-      <a style={{ fontSize: "20px" }} href="/">
-        Go to home
-      </a>
-    </div>
-  );
+  if (isAuth) {
+    return <Outlet />;
+  } else if (localStorage.accessToken && localStorage.refreshToken) {
+    if (CheckToken(localStorage.accessToken, localStorage.refreshToken)) {
+      return <Outlet />;
+    } else {
+      return <Error />;
+    }
+  } else {
+    return <Error />;
+  }
 }
 
 export default PrivateRoute;
