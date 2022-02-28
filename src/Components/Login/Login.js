@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import "./Login.scss";
 import logo from "../../UI/logo.svg";
 import { Link, useNavigate, Navigate } from "react-router-dom";
@@ -16,38 +16,45 @@ export default function Login() {
   const [snackbarSeverity, setsnackbarSeverity] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function submitResetEmail(e) {
-    e.preventDefault();
-    setLoading(true);
-    await axios
-      .post(`${process.env.REACT_APP_SERVER_LINK}/reset-password`, {
-        email: email,
-      })
-      .then((res) => {
+  const submitResetEmail = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+        var res = await axios.post(
+          `${process.env.REACT_APP_SERVER_LINK}/reset-password`,
+          {
+            email: email,
+          }
+        );
         if (res.status === 200) {
           setOpenSnackbar(true);
           setsnackbarSeverity("success");
           setSnackbarMessage(res.data["success"]);
           setLoading(false);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         setOpenSnackbar(true);
         setsnackbarSeverity("error");
         setSnackbarMessage(err.response.data["error"]);
         setLoading(false);
-      });
-  }
+      }
+    },
+    [email]
+  );
 
-  async function submitLogin(e) {
-    e.preventDefault();
-    setLoading(true);
-    await axios
-      .post(`${process.env.REACT_APP_SERVER_LINK}/signin`, {
-        email: email,
-        password: password,
-      })
-      .then((res) => {
+  const submitLogin = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+        var res = await axios.post(
+          `${process.env.REACT_APP_SERVER_LINK}/signin`,
+          {
+            email: email,
+            password: password,
+          }
+        );
         if (res.status === 200) {
           auth.login(() => {
             localStorage.setItem("accessToken", res.data["accessToken"]);
@@ -56,14 +63,15 @@ export default function Login() {
             setLoading(false);
           });
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         setOpenSnackbar(true);
         setsnackbarSeverity("error");
         setSnackbarMessage(err.response.data["error"]);
         setLoading(false);
-      });
-  }
+      }
+    },
+    [email, password, navigate]
+  );
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {

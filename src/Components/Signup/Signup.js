@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import "./Signup.scss";
 import logo from "../../UI/logo.svg";
 import { Link, Navigate, useNavigate } from "react-router-dom";
@@ -14,15 +14,18 @@ export default function Signup() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const submit = (e) => {
-    setLoading(true);
-    e.preventDefault();
-    axios
-      .post(`${process.env.REACT_APP_SERVER_LINK}/signup`, {
-        email: email,
-        password: password,
-      })
-      .then((res) => {
+  const submit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+        var res = await axios.post(
+          `${process.env.REACT_APP_SERVER_LINK}/signup`,
+          {
+            email: email,
+            password: password,
+          }
+        );
         if (res.status === 200) {
           auth.login(() => {
             localStorage.setItem("accessToken", res.data["accessToken"]);
@@ -31,13 +34,14 @@ export default function Signup() {
             setLoading(false);
           });
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         setOpenSnackbar(true);
         setSnackbarMessage(err.response.data["error"]);
         setLoading(false);
-      });
-  };
+      }
+    },
+    [email, password, navigate]
+  );
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -50,7 +54,7 @@ export default function Signup() {
     <div className="signup">
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        openSnackbar={openSnackbar}
+        open={openSnackbar}
         autoHideDuration={4000}
         onClose={handleClose}
       >
