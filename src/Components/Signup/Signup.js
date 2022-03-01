@@ -15,6 +15,20 @@ export default function Signup() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const updateEmail = useCallback(
+    (e) => {
+      setEmail(e.target.value);
+    },
+    [setEmail]
+  );
+
+  const updatePassword = useCallback(
+    (e) => {
+      setPassword(e.target.value);
+    },
+    [setPassword]
+  );
+
   const submit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -65,7 +79,7 @@ export default function Signup() {
             required
             className="signup__content--input"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={updateEmail}
             placeholder="Enter your email address..."
           />
         </div>
@@ -78,7 +92,7 @@ export default function Signup() {
               required
               className="signup__content--input"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={updatePassword}
               placeholder="Enter your password..."
             />
           </div>

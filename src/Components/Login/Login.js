@@ -17,6 +17,20 @@ export default function Login() {
   const [snackbarSeverity, setsnackbarSeverity] = useState("error");
   const [loading, setLoading] = useState(false);
 
+  const updateEmail = useCallback(
+    (e) => {
+      setEmail(e.target.value);
+    },
+    [setEmail]
+  );
+
+  const updatePassword = useCallback(
+    (e) => {
+      setPassword(e.target.value);
+    },
+    [setPassword]
+  );
+
   const submitResetEmail = useCallback(
     async (e) => {
       e.preventDefault();
@@ -83,7 +97,7 @@ export default function Login() {
             required
             className="login__content--input"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={updateEmail}
             placeholder="Enter your email address..."
           />
         </div>
@@ -121,7 +135,7 @@ export default function Login() {
             required
             className="login__content--input"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={updateEmail}
             placeholder="Enter your email address..."
           />
         </div>
@@ -134,7 +148,7 @@ export default function Login() {
               required
               className="login__content--input"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={updatePassword}
               placeholder="Enter your password..."
             />
           </div>
