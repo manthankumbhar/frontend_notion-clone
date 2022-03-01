@@ -4,7 +4,8 @@ import logo from "../../UI/logo.svg";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import auth from "../../hoc/auth";
-import { Alert, CircularProgress, Snackbar } from "@mui/material";
+import { CircularProgress } from "@mui/material";
+import SnackBar from "../SnackBar/SnackBar";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -30,8 +31,8 @@ export default function Signup() {
           auth.login(() => {
             localStorage.setItem("accessToken", res.data["accessToken"]);
             localStorage.setItem("refreshToken", res.data["refreshToken"]);
-            navigate("/home");
             setLoading(false);
+            navigate("/home");
           });
         }
       } catch (err) {
@@ -43,25 +44,14 @@ export default function Signup() {
     [email, password, navigate]
   );
 
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenSnackbar(false);
-  };
-
   return (
     <div className="signup">
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={openSnackbar}
-        autoHideDuration={4000}
-        onClose={handleClose}
-      >
-        <Alert severity="error" sx={{ width: "30rem", fontSize: "1.4rem" }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <SnackBar
+        setOpenSnackBar={setOpenSnackbar}
+        openSnackBar={openSnackbar}
+        snackBarSeverity="error"
+        snackBarMessage={snackbarMessage}
+      />
       <Link to="/" className="signup__logo">
         <img src={logo} alt="logo" />
       </Link>

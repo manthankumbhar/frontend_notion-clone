@@ -4,7 +4,8 @@ import logo from "../../UI/logo.svg";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import axios from "axios";
 import auth from "../../hoc/auth";
-import { Alert, CircularProgress, Snackbar } from "@mui/material";
+import { CircularProgress } from "@mui/material";
+import SnackBar from "../SnackBar/SnackBar";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setsnackbarSeverity] = useState("");
+  const [snackbarSeverity, setsnackbarSeverity] = useState("error");
   const [loading, setLoading] = useState(false);
 
   const submitResetEmail = useCallback(
@@ -35,7 +36,6 @@ export default function Login() {
         }
       } catch (err) {
         setOpenSnackbar(true);
-        setsnackbarSeverity("error");
         setSnackbarMessage(err.response.data["error"]);
         setLoading(false);
       }
@@ -59,26 +59,18 @@ export default function Login() {
           auth.login(() => {
             localStorage.setItem("accessToken", res.data["accessToken"]);
             localStorage.setItem("refreshToken", res.data["refreshToken"]);
-            navigate("/home");
             setLoading(false);
+            navigate("/home");
           });
         }
       } catch (err) {
         setOpenSnackbar(true);
-        setsnackbarSeverity("error");
         setSnackbarMessage(err.response.data["error"]);
         setLoading(false);
       }
     },
     [email, password, navigate]
   );
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenSnackbar(false);
-  };
 
   function resetPasswordForm() {
     return (
@@ -172,19 +164,12 @@ export default function Login() {
 
   return (
     <div className="login">
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={openSnackbar}
-        autoHideDuration={4000}
-        onClose={handleClose}
-      >
-        <Alert
-          severity={snackbarSeverity}
-          sx={{ width: "30rem", fontSize: "1.4rem" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <SnackBar
+        setOpenSnackBar={setOpenSnackbar}
+        openSnackBar={openSnackbar}
+        snackBarSeverity={snackbarSeverity}
+        snackBarMessage={snackbarMessage}
+      />
       <Link to="/" className="login__logo">
         <img src={logo} alt="logo" />
       </Link>
