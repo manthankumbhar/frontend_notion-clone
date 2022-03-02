@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from "react";
 import "./Signup.scss";
-import logo from "../../UI/logo.svg";
+import logo from "UI/logo.svg";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
-import auth from "../../hoc/auth";
+import auth from "hoc/auth";
 import { CircularProgress } from "@mui/material";
-import SnackBar from "../SnackBar/SnackBar";
+import SnackBar from "Components/SnackBar/SnackBar";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
