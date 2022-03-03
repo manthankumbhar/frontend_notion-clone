@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import "./Signup.scss";
+import "Components/Signup/Signup.scss";
 import logo from "UI/logo.svg";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";

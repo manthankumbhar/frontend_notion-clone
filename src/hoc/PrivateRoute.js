@@ -1,7 +1,7 @@
 import React from "react";
 import { isExpired } from "react-jwt";
 import { Outlet } from "react-router";
-import auth from "./auth";
+import auth from "hoc/auth";
 import axios from "axios";
 import Error from "Components/Error/Error";
 

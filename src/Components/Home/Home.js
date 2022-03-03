@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import auth from "hoc/auth";
 import img from "UI/under_construction.png";
 import logo from "UI/logo.svg";
-import "./Home.scss";
+import "Components/Home/Home.scss";
 
 export default function Home() {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router";
-import "./App.scss";
+import "App.scss";
 import Home from "Components/Home/Home";
 import Login from "Components/Login/Login";
 import Signup from "Components/Signup/Signup";
