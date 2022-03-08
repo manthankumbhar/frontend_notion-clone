@@ -43,8 +43,8 @@ export default function Signup() {
         );
         if (res.status === 200) {
           auth.login(() => {
-            localStorage.setItem("accessToken", res.data["access-token"]);
-            localStorage.setItem("refreshToken", res.data["refresh-token"]);
+            localStorage.setItem("accessToken", res.data["access_token"]);
+            localStorage.setItem("refreshToken", res.data["refresh_token"]);
             setLoading(false);
             navigate("/home");
           });

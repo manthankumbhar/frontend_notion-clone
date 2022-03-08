@@ -19,8 +19,8 @@ function CheckToken(accessToken, refreshToken) {
         if (res.status === 200) {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
-          localStorage.setItem("accessToken", res.data["access-token"]);
-          localStorage.setItem("refreshToken", res.data["refresh-token"]);
+          localStorage.setItem("accessToken", res.data["access_token"]);
+          localStorage.setItem("refreshToken", res.data["refresh_token"]);
         }
       });
     return true;
