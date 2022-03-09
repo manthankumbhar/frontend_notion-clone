@@ -9,5 +9,23 @@
     background-color: #191919;
     color: #f2f2f2;
     min-height: 100vh;
+    line-height: 1;
+  }
+
+  &__styles {
+    &--quote {
+      border-left: 2px solid grey;
+      color: grey;
+      padding-left: 1rem;
+      margin-left: 0;
+    }
+
+    &--code {
+      background-color: #87837826;
+      color: #eb5757;
+      padding: 5px;
+      border-radius: 4px;
+      font-size: 1.4rem;
+    }
   }
 }
