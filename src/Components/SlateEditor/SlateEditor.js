@@ -248,7 +248,6 @@ export default function SlateEditor() {
       >
         {showMenu ? renderMenu() : null}
         <Editable
-          id="editor__editable"
           className="editor__area"
           renderElement={renderElement}
           renderLeaf={renderLeaf}
