@@ -31,28 +31,32 @@ export default function SlateEditor() {
   const [coordinates, setCoordinates] = useState("");
   const allowedTags = [
     {
-      label: "h1",
+      label: "Text",
+      value: "paragraph",
+    },
+    {
+      label: "Heading 1",
       value: "heading-one",
     },
     {
-      label: "h2",
+      label: "Heading 2",
       value: "heading-two",
     },
     {
-      label: "quote",
-      value: "block-quote",
+      label: "Heading 3",
+      value: "heading-three",
     },
     {
-      label: "numbered",
-      value: "numbered-list",
-    },
-    {
-      label: "bullets",
+      label: "Bulleted list",
       value: "bulleted-list",
     },
     {
-      label: "p",
-      value: "paragraph",
+      label: "Numbered list",
+      value: "numbered-list",
+    },
+    {
+      label: "Quote",
+      value: "block-quote",
     },
   ];
   const [menuOptions, setMenuOptions] = useState(allowedTags);
@@ -76,6 +80,8 @@ export default function SlateEditor() {
         return <h1 {...props.attributes}>{props.children}</h1>;
       case "heading-two":
         return <h2 {...props.attributes}>{props.children}</h2>;
+      case "heading-three":
+        return <h3 {...props.attributes}>{props.children}</h3>;
       case "list-item":
         return <li {...props.attributes}>{props.children}</li>;
       case "numbered-list":
@@ -177,58 +183,75 @@ export default function SlateEditor() {
         x = rect.top;
         y = rect.left;
       }
+      return { top: x > 120 ? x - 150 : x + 20, left: y };
+    } else {
+      alert("Internal server error, please try again later");
     }
-    return { top: x > 120 ? x - 150 : x + 20, left: y };
   };
 
   const closeMenu = useCallback(() => {
     setShowMenu(false);
     document.removeEventListener("click", closeMenu);
-  }, []);
+  }, [setShowMenu]);
 
   const openMenu = useCallback(() => {
     const position = getCoordinates();
     setCoordinates(position);
     setShowMenu(true);
     document.addEventListener("click", closeMenu);
-  }, [closeMenu]);
+  }, [closeMenu, setCoordinates, setShowMenu]);
 
-  const renderMenu = () => {
+  const editorOnKeyDown = useCallback(
+    (event) => {
+      if (
+        event.key === " " ||
+        event.key === "Backspace" ||
+        event.key === "Escape"
+      ) {
+        closeMenu();
+        ReactEditor.focus(editor);
+        event.preventDefault();
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+      }
+    },
+    [closeMenu, editor]
+  );
+
+  const markdownListMenuOptions = menuOptions.map((item, key) => {
+    return (
+      <MenuItem
+        tabIndex="0"
+        key={key}
+        onClick={() => {
+          CustomEditor.toggleBlock(editor, item.value);
+          closeMenu();
+          ReactEditor.focus(editor);
+        }}
+      >
+        {item.label}
+      </MenuItem>
+    );
+  });
+
+  const markdownListMenu = useCallback(() => {
     return (
       <Menu
         className="editor__menu"
         style={coordinates}
         ref={menuFocus}
-        onKeyDown={(event) => {
-          if (event.key === " " || event.key === "Backspace") {
-            closeMenu();
-            ReactEditor.focus(editor);
-            event.preventDefault();
-          }
-
-          if (event.key === "Enter") {
-            event.preventDefault();
-          }
-        }}
+        onKeyDown={editorOnKeyDown}
       >
-        {menuOptions.map((item, key) => {
-          return (
-            <MenuItem
-              tabIndex="0"
-              key={key}
-              onClick={() => {
-                CustomEditor.toggleBlock(editor, item.value);
-                closeMenu();
-                ReactEditor.focus(editor);
-              }}
-            >
-              {item.label}
-            </MenuItem>
-          );
-        })}
+        {markdownListMenuOptions}
       </Menu>
     );
-  };
+  }, [markdownListMenuOptions, coordinates, menuFocus, editorOnKeyDown]);
+
+  const renderMarkdownListMenu = useCallback(() => {
+    return showMenu ? showMenu && markdownListMenu() : null;
+  }, [showMenu, markdownListMenu]);
 
   return (
     <div className="editor">
@@ -246,7 +269,7 @@ export default function SlateEditor() {
           }
         }}
       >
-        {showMenu ? renderMenu() : null}
+        {renderMarkdownListMenu()}
         <Editable
           className="editor__area"
           renderElement={renderElement}
@@ -254,9 +277,6 @@ export default function SlateEditor() {
           onKeyDown={(event) => {
             if (event.key === "/") {
               openMenu();
-            }
-            if (event.key === " " || event.key === "Backspace") {
-              closeMenu();
             }
             if (event.key === "Enter") {
               event.preventDefault();
