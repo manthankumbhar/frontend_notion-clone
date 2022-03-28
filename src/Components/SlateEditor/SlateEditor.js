@@ -83,9 +83,17 @@ export default function SlateEditor() {
       case "heading-three":
         return <h3 {...props.attributes}>{props.children}</h3>;
       case "list-item":
-        return <li {...props.attributes}>{props.children}</li>;
+        return (
+          <li {...props.attributes} className="editor__styles--lists">
+            {props.children}
+          </li>
+        );
       case "numbered-list":
-        return <ol {...props.attributes}>{props.children}</ol>;
+        return (
+          <ol {...props.attributes} className="editor__styles--lists">
+            {props.children}
+          </ol>
+        );
       default:
         return <p {...props.attributes}>{props.children}</p>;
     }
@@ -191,17 +199,23 @@ export default function SlateEditor() {
 
   const closeMenu = useCallback(() => {
     setShowMenu(false);
-    document.removeEventListener("click", closeMenu);
   }, [setShowMenu]);
 
   const openMenu = useCallback(() => {
     const position = getCoordinates();
     setCoordinates(position);
     setShowMenu(true);
-    document.addEventListener("click", closeMenu);
-  }, [closeMenu, setCoordinates, setShowMenu]);
+  }, [setCoordinates, setShowMenu]);
 
-  const editorOnKeyDown = useCallback(
+  const addMenuEventListener = useCallback(() => {
+    document.addEventListener("click", closeMenu);
+  }, [closeMenu]);
+
+  const removeMenuEventListener = useCallback(() => {
+    document.removeEventListener("click", closeMenu);
+  }, [closeMenu]);
+
+  const menuOnKeyDown = useCallback(
     (event) => {
       if (
         event.key === " " ||
@@ -209,6 +223,7 @@ export default function SlateEditor() {
         event.key === "Escape"
       ) {
         closeMenu();
+        removeMenuEventListener();
         ReactEditor.focus(editor);
         event.preventDefault();
       }
@@ -217,20 +232,22 @@ export default function SlateEditor() {
         event.preventDefault();
       }
     },
-    [closeMenu, editor]
+    [closeMenu, editor, removeMenuEventListener]
+  );
+
+  var onClickMenu = useCallback(
+    (item) => {
+      CustomEditor.toggleBlock(editor, item.value);
+      closeMenu();
+      removeMenuEventListener();
+      ReactEditor.focus(editor);
+    },
+    [closeMenu, editor, removeMenuEventListener]
   );
 
   const markdownListMenuOptions = menuOptions.map((item, key) => {
     return (
-      <MenuItem
-        tabIndex="0"
-        key={key}
-        onClick={() => {
-          CustomEditor.toggleBlock(editor, item.value);
-          closeMenu();
-          ReactEditor.focus(editor);
-        }}
-      >
+      <MenuItem tabIndex="0" key={key} onClick={() => onClickMenu(item)}>
         {item.label}
       </MenuItem>
     );
@@ -242,16 +259,80 @@ export default function SlateEditor() {
         className="editor__menu"
         style={coordinates}
         ref={menuFocus}
-        onKeyDown={editorOnKeyDown}
+        onKeyDown={menuOnKeyDown}
       >
         {markdownListMenuOptions}
       </Menu>
     );
-  }, [markdownListMenuOptions, coordinates, menuFocus, editorOnKeyDown]);
+  }, [markdownListMenuOptions, coordinates, menuFocus, menuOnKeyDown]);
 
-  const renderMarkdownListMenu = useCallback(() => {
+  const RenderMarkdownListMenu = useCallback(() => {
     return showMenu ? showMenu && markdownListMenu() : null;
   }, [showMenu, markdownListMenu]);
+
+  const editorOnKeyDown = useCallback(
+    (event) => {
+      if (event.key === "/") {
+        openMenu();
+        addMenuEventListener();
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const isList = LIST_TYPES.includes(editor.getFragment()[0].type);
+        return isList
+          ? Transforms.insertNodes(editor, {
+              type: "list-item",
+              children: [{ text: "" }],
+            })
+          : Transforms.insertNodes(editor, {
+              type: "paragraph",
+              children: [{ text: "" }],
+            });
+      }
+
+      if (!event.ctrlKey) {
+        return;
+      }
+
+      switch (event.key) {
+        case "e": {
+          event.preventDefault();
+          CustomEditor.toggleMark(editor, "code");
+          break;
+        }
+
+        case "b": {
+          event.preventDefault();
+          CustomEditor.toggleMark(editor, "bold");
+          break;
+        }
+
+        case "i": {
+          event.preventDefault();
+          CustomEditor.toggleMark(editor, "italic");
+          break;
+        }
+
+        case "u": {
+          event.preventDefault();
+          CustomEditor.toggleMark(editor, "underline");
+          break;
+        }
+
+        case "s": {
+          event.preventDefault();
+          CustomEditor.toggleMark(editor, "strikeThrough");
+          break;
+        }
+
+        default: {
+          return null;
+        }
+      }
+    },
+    [addMenuEventListener, editor, openMenu]
+  );
 
   return (
     <div className="editor">
@@ -269,67 +350,12 @@ export default function SlateEditor() {
           }
         }}
       >
-        {renderMarkdownListMenu()}
+        <RenderMarkdownListMenu />
         <Editable
           className="editor__area"
           renderElement={renderElement}
           renderLeaf={renderLeaf}
-          onKeyDown={(event) => {
-            if (event.key === "/") {
-              openMenu();
-            }
-            if (event.key === "Enter") {
-              event.preventDefault();
-              const isList = LIST_TYPES.includes(editor.getFragment()[0].type);
-              return isList
-                ? Transforms.insertNodes(editor, {
-                    type: "list-item",
-                    children: [{ text: "" }],
-                  })
-                : Transforms.insertNodes(editor, {
-                    type: "paragraph",
-                    children: [{ text: "" }],
-                  });
-            }
-            if (!event.ctrlKey) {
-              return;
-            }
-            switch (event.key) {
-              case "e": {
-                event.preventDefault();
-                CustomEditor.toggleMark(editor, "code");
-                break;
-              }
-
-              case "b": {
-                event.preventDefault();
-                CustomEditor.toggleMark(editor, "bold");
-                break;
-              }
-
-              case "i": {
-                event.preventDefault();
-                CustomEditor.toggleMark(editor, "italic");
-                break;
-              }
-
-              case "u": {
-                event.preventDefault();
-                CustomEditor.toggleMark(editor, "underline");
-                break;
-              }
-
-              case "s": {
-                event.preventDefault();
-                CustomEditor.toggleMark(editor, "strikeThrough");
-                break;
-              }
-
-              default: {
-                return null;
-              }
-            }
-          }}
+          onKeyDown={editorOnKeyDown}
         />
       </Slate>
     </div>
