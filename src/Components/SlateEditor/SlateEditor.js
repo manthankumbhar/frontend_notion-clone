@@ -207,14 +207,6 @@ export default function SlateEditor() {
     setShowMenu(true);
   }, [setCoordinates, setShowMenu]);
 
-  const addMenuEventListener = useCallback(() => {
-    document.addEventListener("click", closeMenu);
-  }, [closeMenu]);
-
-  const removeMenuEventListener = useCallback(() => {
-    document.removeEventListener("click", closeMenu);
-  }, [closeMenu]);
-
   const menuOnKeyDown = useCallback(
     (event) => {
       if (
@@ -223,7 +215,6 @@ export default function SlateEditor() {
         event.key === "Escape"
       ) {
         closeMenu();
-        removeMenuEventListener();
         ReactEditor.focus(editor);
         event.preventDefault();
       }
@@ -232,17 +223,16 @@ export default function SlateEditor() {
         event.preventDefault();
       }
     },
-    [closeMenu, editor, removeMenuEventListener]
+    [closeMenu, editor]
   );
 
   var onClickMenu = useCallback(
     (item) => {
       CustomEditor.toggleBlock(editor, item.value);
       closeMenu();
-      removeMenuEventListener();
       ReactEditor.focus(editor);
     },
-    [closeMenu, editor, removeMenuEventListener]
+    [closeMenu, editor]
   );
 
   const markdownListMenuOptions = menuOptions.map((item, key) => {
@@ -253,7 +243,7 @@ export default function SlateEditor() {
     );
   });
 
-  const markdownListMenu = useCallback(() => {
+  const MarkdownListMenu = useCallback(() => {
     return (
       <Menu
         className="editor__menu"
@@ -267,14 +257,19 @@ export default function SlateEditor() {
   }, [markdownListMenuOptions, coordinates, menuFocus, menuOnKeyDown]);
 
   const RenderMarkdownListMenu = useCallback(() => {
-    return showMenu ? showMenu && markdownListMenu() : null;
-  }, [showMenu, markdownListMenu]);
+    return showMenu ? showMenu && <MarkdownListMenu /> : null;
+  }, [showMenu]);
+
+  useEffect(() => {
+    showMenu
+      ? document.addEventListener("click", closeMenu)
+      : document.removeEventListener("click", closeMenu);
+  }, [showMenu, closeMenu]);
 
   const editorOnKeyDown = useCallback(
     (event) => {
       if (event.key === "/") {
         openMenu();
-        addMenuEventListener();
       }
 
       if (event.key === "Enter") {
@@ -331,7 +326,7 @@ export default function SlateEditor() {
         }
       }
     },
-    [addMenuEventListener, editor, openMenu]
+    [editor, openMenu]
   );
 
   return (
