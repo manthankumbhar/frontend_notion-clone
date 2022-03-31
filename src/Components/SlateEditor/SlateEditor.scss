@@ -12,6 +12,11 @@
     line-height: 1;
   }
 
+  input[type="checkbox"]:checked + span {
+    color: grey;
+    text-decoration: line-through;
+  }
+
   &__styles {
     &--quote {
       border-left: 2px solid grey;
@@ -22,6 +27,17 @@
 
     &--lists {
       margin: 8px 2px;
+    }
+
+    &--checklist {
+      display: flex;
+      align-items: center;
+      margin: 8px 5px;
+
+      &-input {
+        margin-right: 1rem;
+        cursor: pointer;
+      }
     }
 
     &--code {

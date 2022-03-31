@@ -55,6 +55,10 @@ export default function SlateEditor() {
       value: "numbered-list",
     },
     {
+      label: "Check list",
+      value: "check-list",
+    },
+    {
       label: "Quote",
       value: "block-quote",
     },
@@ -66,38 +70,61 @@ export default function SlateEditor() {
     menuFocus.current?.focus();
   }, [menuFocus]);
 
-  const renderElement = useCallback((props) => {
-    switch (props.element.type) {
-      case "block-quote":
-        return (
-          <blockquote {...props.attributes} className="editor__styles--quote">
-            {props.children}
-          </blockquote>
-        );
-      case "bulleted-list":
-        return <ul {...props.attributes}>{props.children}</ul>;
-      case "heading-one":
-        return <h1 {...props.attributes}>{props.children}</h1>;
-      case "heading-two":
-        return <h2 {...props.attributes}>{props.children}</h2>;
-      case "heading-three":
-        return <h3 {...props.attributes}>{props.children}</h3>;
-      case "list-item":
-        return (
-          <li {...props.attributes} className="editor__styles--lists">
-            {props.children}
-          </li>
-        );
-      case "numbered-list":
-        return (
-          <ol {...props.attributes} className="editor__styles--lists">
-            {props.children}
-          </ol>
-        );
-      default:
-        return <p {...props.attributes}>{props.children}</p>;
-    }
-  }, []);
+  const renderElement = useCallback(
+    (props) => {
+      switch (props.element.type) {
+        case "block-quote":
+          return (
+            <blockquote {...props.attributes} className="editor__styles--quote">
+              {props.children}
+            </blockquote>
+          );
+        case "bulleted-list":
+          return <ul {...props.attributes}>{props.children}</ul>;
+        case "heading-one":
+          return <h1 {...props.attributes}>{props.children}</h1>;
+        case "heading-two":
+          return <h2 {...props.attributes}>{props.children}</h2>;
+        case "heading-three":
+          return <h3 {...props.attributes}>{props.children}</h3>;
+        case "list-item":
+          return (
+            <li {...props.attributes} className="editor__styles--lists">
+              {props.children}
+            </li>
+          );
+        case "numbered-list":
+          return (
+            <ol {...props.attributes} className="editor__styles--lists">
+              {props.children}
+            </ol>
+          );
+        case "check-list":
+          return (
+            <span className="editor__styles--checklist">
+              <input
+                {...props.attributes}
+                type="checkbox"
+                className="editor__styles--checklist-input"
+                checked={props.children[0].props.parent.checked}
+                onChange={(e) => {
+                  const newProperties = {
+                    type: "check-list",
+                    children: props.children,
+                    checked: e.target.checked,
+                  };
+                  Transforms.setNodes(editor, newProperties);
+                }}
+              />
+              {props.children}
+            </span>
+          );
+        default:
+          return <p {...props.attributes}>{props.children}</p>;
+      }
+    },
+    [editor]
+  );
 
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
 
@@ -160,6 +187,7 @@ export default function SlateEditor() {
     toggleBlock(editor, format) {
       const isActive = CustomEditor.isBlockActive(editor, format);
       const isList = LIST_TYPES.includes(format);
+      const isChecklist = format === "check-list";
 
       Transforms.unwrapNodes(editor, {
         match: (n) =>
@@ -176,6 +204,11 @@ export default function SlateEditor() {
       if (!isActive && isList) {
         const block = { type: format, children: [] };
         Transforms.wrapNodes(editor, block);
+      }
+
+      if (!isActive && isChecklist) {
+        const block = { type: format, children: [], checked: false };
+        Transforms.setNodes(editor, block);
       }
     },
   };
@@ -214,9 +247,9 @@ export default function SlateEditor() {
         event.key === "Backspace" ||
         event.key === "Escape"
       ) {
+        event.preventDefault();
         closeMenu();
         ReactEditor.focus(editor);
-        event.preventDefault();
       }
 
       if (event.key === "Enter") {
@@ -275,15 +308,53 @@ export default function SlateEditor() {
       if (event.key === "Enter") {
         event.preventDefault();
         const isList = LIST_TYPES.includes(editor.getFragment()[0].type);
-        return isList
-          ? Transforms.insertNodes(editor, {
-              type: "list-item",
-              children: [{ text: "" }],
-            })
-          : Transforms.insertNodes(editor, {
+        const isChecklist = editor.getFragment()[0].type === "check-list";
+        if (isList) {
+          return Transforms.insertNodes(editor, {
+            type: "list-item",
+            children: [{ text: "" }],
+          });
+        } else if (isChecklist) {
+          return Transforms.insertNodes(editor, {
+            type: "check-list",
+            children: [{ text: "" }],
+            checked: false,
+          });
+        } else {
+          Transforms.insertNodes(editor, {
+            type: "paragraph",
+            children: [{ text: "" }],
+          });
+        }
+      }
+
+      if (event.key === "Backspace") {
+        const isList = LIST_TYPES.includes(editor.getFragment()[0].type);
+        const isChecklist = editor.getFragment()[0].type === "check-list";
+        if (isList) {
+          const listLength =
+            editor.children[editor.selection.anchor.path[0]].children[
+              editor.selection.anchor.path[1]
+            ].children[0].text.length;
+          const listType = editor.getFragment()[0].type;
+          if (listLength === 0) {
+            event.preventDefault();
+            CustomEditor.toggleBlock(editor, listType);
+          }
+        } else if (isChecklist) {
+          const checklistLength =
+            editor.children[editor.selection.anchor.path[0]].children[0].text
+              .length;
+          if (checklistLength === 0) {
+            event.preventDefault();
+            Transforms.setNodes(editor, {
               type: "paragraph",
               children: [{ text: "" }],
             });
+          }
+        } else {
+          return null;
+        }
       }
 
       if (!event.ctrlKey) {
