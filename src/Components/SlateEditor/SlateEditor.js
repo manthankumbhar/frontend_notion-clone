@@ -70,60 +70,91 @@ export default function SlateEditor() {
     menuFocus.current?.focus();
   }, [menuFocus]);
 
+  const headingOneElement = (props) => (
+    <h1 {...props.attributes}>{props.children}</h1>
+  );
+
+  const headingTwoElement = (props) => (
+    <h2 {...props.attributes}>{props.children}</h2>
+  );
+
+  const headingThreeElement = (props) => (
+    <h3 {...props.attributes}>{props.children}</h3>
+  );
+
+  const numberedListElement = (props) => (
+    <ol {...props.attributes} className="editor__styles--lists">
+      {props.children}
+    </ol>
+  );
+
+  const bulletedListElement = (props) => (
+    <ul {...props.attributes}>{props.children}</ul>
+  );
+
+  const listItemElement = (props) => (
+    <li {...props.attributes} className="editor__styles--lists">
+      {props.children}
+    </li>
+  );
+
+  const onChangeChecklist = useCallback(
+    (e, props) => {
+      const newProperties = {
+        type: "check-list",
+        children: props.children,
+        checked: e.target.checked,
+      };
+      Transforms.setNodes(editor, newProperties);
+    },
+    [editor]
+  );
+
+  const checkListElement = (props) => (
+    <span className="editor__styles--checklist">
+      <input
+        {...props.attributes}
+        type="checkbox"
+        className="editor__styles--checklist-input"
+        checked={props.children[0].props.parent.checked}
+        onChange={(e) => {
+          onChangeChecklist(e, props);
+        }}
+      />
+      {props.children}
+    </span>
+  );
+
+  const blockQuoteElement = (props) => (
+    <blockquote {...props.attributes} className="editor__styles--quote">
+      {props.children}
+    </blockquote>
+  );
+
   const renderElement = useCallback(
     (props) => {
       switch (props.element.type) {
-        case "block-quote":
-          return (
-            <blockquote {...props.attributes} className="editor__styles--quote">
-              {props.children}
-            </blockquote>
-          );
-        case "bulleted-list":
-          return <ul {...props.attributes}>{props.children}</ul>;
         case "heading-one":
-          return <h1 {...props.attributes}>{props.children}</h1>;
+          return headingOneElement(props);
         case "heading-two":
-          return <h2 {...props.attributes}>{props.children}</h2>;
+          return headingTwoElement(props);
         case "heading-three":
-          return <h3 {...props.attributes}>{props.children}</h3>;
-        case "list-item":
-          return (
-            <li {...props.attributes} className="editor__styles--lists">
-              {props.children}
-            </li>
-          );
+          return headingThreeElement(props);
         case "numbered-list":
-          return (
-            <ol {...props.attributes} className="editor__styles--lists">
-              {props.children}
-            </ol>
-          );
+          return numberedListElement(props);
+        case "bulleted-list":
+          return bulletedListElement(props);
         case "check-list":
-          return (
-            <span className="editor__styles--checklist">
-              <input
-                {...props.attributes}
-                type="checkbox"
-                className="editor__styles--checklist-input"
-                checked={props.children[0].props.parent.checked}
-                onChange={(e) => {
-                  const newProperties = {
-                    type: "check-list",
-                    children: props.children,
-                    checked: e.target.checked,
-                  };
-                  Transforms.setNodes(editor, newProperties);
-                }}
-              />
-              {props.children}
-            </span>
-          );
+          return checkListElement(props);
+        case "list-item":
+          return listItemElement(props);
+        case "block-quote":
+          return blockQuoteElement(props);
         default:
           return <p {...props.attributes}>{props.children}</p>;
       }
     },
-    [editor]
+    [editor, checkListElement]
   );
 
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
