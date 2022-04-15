@@ -64,6 +64,7 @@ export default function SlateEditor() {
     },
   ];
   const [menuOptions, setMenuOptions] = useState(allowedTags);
+  console.log(setMenuOptions);
   const menuFocus = createRef();
 
   useEffect(() => {
