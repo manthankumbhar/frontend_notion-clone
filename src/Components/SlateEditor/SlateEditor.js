@@ -26,7 +26,7 @@ export default function SlateEditor() {
       },
     ]
   );
-  const LIST_TYPES = ["numbered-list", "bulleted-list"];
+  const LIST_TYPES = useMemo(() => ["numbered-list", "bulleted-list"], []);
   const [showMenu, setShowMenu] = useState(false);
   const [coordinates, setCoordinates] = useState("");
   const allowedTags = [
@@ -110,19 +110,24 @@ export default function SlateEditor() {
     [editor]
   );
 
-  const checkListElement = (props) => (
-    <span className="editor__styles--checklist">
-      <input
-        {...props.attributes}
-        type="checkbox"
-        className="editor__styles--checklist-input"
-        checked={props.children[0].props.parent.checked}
-        onChange={(e) => {
-          onChangeChecklist(e, props);
-        }}
-      />
-      {props.children}
-    </span>
+  const checkListElement = useCallback(
+    (props) => {
+      return (
+        <span className="editor__styles--checklist">
+          <input
+            {...props.attributes}
+            type="checkbox"
+            className="editor__styles--checklist-input"
+            checked={props.children[0].props.parent.checked}
+            onChange={(e) => {
+              onChangeChecklist(e, props);
+            }}
+          />
+          {props.children}
+        </span>
+      );
+    },
+    [onChangeChecklist]
   );
 
   const blockQuoteElement = (props) => (
@@ -154,7 +159,7 @@ export default function SlateEditor() {
           return <p {...props.attributes}>{props.children}</p>;
       }
     },
-    [editor, checkListElement]
+    [checkListElement]
   );
 
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
@@ -183,40 +188,38 @@ export default function SlateEditor() {
     return <span {...attributes}>{children}</span>;
   };
 
-  const CustomEditor = {
-    isMarkActive(editor, format) {
-      const marks = Editor.marks(editor);
-      return marks ? marks[format] === true : false;
-    },
+  function isMarkActive(editor, format) {
+    const marks = Editor.marks(editor);
+    return marks ? marks[format] === true : false;
+  }
 
-    isBlockActive(editor, format) {
-      const { selection } = editor;
-      if (!selection) return false;
+  function isBlockActive(editor, format) {
+    const { selection } = editor;
+    if (!selection) return false;
 
-      const [match] = Array.from(
-        Editor.nodes(editor, {
-          at: Editor.unhangRange(editor, selection),
-          match: (n) =>
-            !Editor.isEditor(n) &&
-            SlateElement.isElement(n) &&
-            n.type === format,
-        })
-      );
+    const [match] = Array.from(
+      Editor.nodes(editor, {
+        at: Editor.unhangRange(editor, selection),
+        match: (n) =>
+          !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
+      })
+    );
 
-      return !!match;
-    },
+    return !!match;
+  }
 
-    toggleMark(editor, format) {
-      const isActive = CustomEditor.isMarkActive(editor, format);
-      if (isActive) {
-        Editor.removeMark(editor, format);
-      } else {
-        Editor.addMark(editor, format, true);
-      }
-    },
+  const toggleMark = useCallback((editor, format) => {
+    const isActive = isMarkActive(editor, format);
+    if (isActive) {
+      Editor.removeMark(editor, format);
+    } else {
+      Editor.addMark(editor, format, true);
+    }
+  }, []);
 
-    toggleBlock(editor, format) {
-      const isActive = CustomEditor.isBlockActive(editor, format);
+  const toggleBlock = useCallback(
+    (editor, format) => {
+      const isActive = isBlockActive(editor, format);
       const isList = LIST_TYPES.includes(format);
       const isChecklist = format === "check-list";
 
@@ -242,7 +245,8 @@ export default function SlateEditor() {
         Transforms.setNodes(editor, block);
       }
     },
-  };
+    [LIST_TYPES]
+  );
 
   const getCoordinates = () => {
     let x, y;
@@ -292,11 +296,11 @@ export default function SlateEditor() {
 
   var onClickMenu = useCallback(
     (item) => {
-      CustomEditor.toggleBlock(editor, item.value);
+      toggleBlock(editor, item.value);
       closeMenu();
       ReactEditor.focus(editor);
     },
-    [closeMenu, editor]
+    [closeMenu, editor, toggleBlock]
   );
 
   const markdownListMenuOptions = menuOptions.map((item, key) => {
@@ -370,7 +374,7 @@ export default function SlateEditor() {
           const listType = editor.getFragment()[0].type;
           if (listLength === 0) {
             event.preventDefault();
-            CustomEditor.toggleBlock(editor, listType);
+            toggleBlock(editor, listType);
           }
         } else if (isChecklist) {
           const checklistLength =
@@ -395,31 +399,31 @@ export default function SlateEditor() {
       switch (event.key) {
         case "e": {
           event.preventDefault();
-          CustomEditor.toggleMark(editor, "code");
+          toggleMark(editor, "code");
           break;
         }
 
         case "b": {
           event.preventDefault();
-          CustomEditor.toggleMark(editor, "bold");
+          toggleMark(editor, "bold");
           break;
         }
 
         case "i": {
           event.preventDefault();
-          CustomEditor.toggleMark(editor, "italic");
+          toggleMark(editor, "italic");
           break;
         }
 
         case "u": {
           event.preventDefault();
-          CustomEditor.toggleMark(editor, "underline");
+          toggleMark(editor, "underline");
           break;
         }
 
         case "s": {
           event.preventDefault();
-          CustomEditor.toggleMark(editor, "strikeThrough");
+          toggleMark(editor, "strikeThrough");
           break;
         }
 
@@ -428,7 +432,7 @@ export default function SlateEditor() {
         }
       }
     },
-    [editor, openMenu]
+    [editor, openMenu, LIST_TYPES, toggleBlock, toggleMark]
   );
 
   return (
