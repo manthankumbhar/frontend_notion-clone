@@ -3,7 +3,7 @@ import { isExpired } from "react-jwt";
 import { Outlet } from "react-router";
 import auth from "hoc/auth";
 import axios from "axios";
-import Error from "Components/Error/Error";
+import Error from "components/Error/Error";
 
 function CheckToken(accessToken, refreshToken) {
   var isAccessTokenExpired = isExpired(accessToken);

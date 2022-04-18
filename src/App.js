@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router";
 import "App.scss";
-import Home from "Components/Home/Home";
-import Login from "Components/Login/Login";
-import Signup from "Components/Signup/Signup";
+import Home from "components/Home/Home";
+import Login from "components/Login/Login";
+import Signup from "components/Signup/Signup";
 import PrivateRoute from "hoc/PrivateRoute";
-import Error from "Components/Error/Error";
+import Error from "components/Error/Error";
 
 export default function App() {
   return (

@@ -1,7 +1,7 @@
 import React from "react";
-import "Components/Home/Home.scss";
-import SlateEditor from "Components/SlateEditor/SlateEditor";
-import Sidebar from "Components/Sidebar/Sidebar";
+import "components/Home/Home.scss";
+import SlateEditor from "components/SlateEditor/SlateEditor";
+import Sidebar from "components/Sidebar/Sidebar";
 
 export default function Home() {
   return (

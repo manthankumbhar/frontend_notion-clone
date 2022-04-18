@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import "Components/SlateEditor/SlateEditor.scss";
+import "components/SlateEditor/SlateEditor.scss";
 import {
   createEditor,
   Editor,

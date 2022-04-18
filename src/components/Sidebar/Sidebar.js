@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import "Components/Sidebar/Sidebar.scss";
+import "components/Sidebar/Sidebar.scss";
 import auth from "hoc/auth";
 import logo from "UI/logo.svg";
 import { useNavigate } from "react-router";
@@ -35,7 +35,7 @@ export default function Sidebar() {
     );
   });
 
-  const SidebarMenu = useCallback(() => {
+  const renderSidebarMenu = useCallback(() => {
     return <div>{sidebarMenuOptions}</div>;
   }, [sidebarMenuOptions]);
 
@@ -50,7 +50,7 @@ export default function Sidebar() {
           <button className="sidebar__menu--headers--btn">+</button>
           {/* will set onClick functionalities once api is done */}
         </div>
-        <SidebarMenu />
+        {renderSidebarMenu()}
       </div>
       <button className="sidebar__btn" onClick={logout}>
         Logout
