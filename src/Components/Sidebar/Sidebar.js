@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import "Components/Sidebar/Sidebar.scss";
 import auth from "hoc/auth";
-import logo from "UI/arc_logo_full.svg";
+import logo from "public/assets/arc_logo_full.svg";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 
