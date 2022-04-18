@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import "Components/Sidebar/Sidebar.scss";
 import auth from "hoc/auth";
-import logo from "UI/logo.svg";
+import logo from "public/assets/arc_logo_full.svg";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 
@@ -18,7 +18,7 @@ export default function Sidebar() {
   return (
     <div className="sidebar">
       <Link to="/" className="sidebar__logo">
-        <img src={logo} alt="logo" />
+        <img src={logo} alt="logo" className="sidebar__logo--icon" />
       </Link>
       <button className="sidebar__btn" onClick={logout}>
         Logout

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import "Components/Signup/Signup.scss";
-import logo from "UI/logo.svg";
+import logo from "public/assets/arc_logo_full.svg";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import auth from "hoc/auth";
