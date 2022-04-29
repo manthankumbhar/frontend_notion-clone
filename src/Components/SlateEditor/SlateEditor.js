@@ -22,7 +22,7 @@ export default function SlateEditor() {
     JSON.parse(localStorage.getItem("content")) || [
       {
         type: "paragraph",
-        children: [{ text: "A line of text in a paragraph." }],
+        children: [{ text: "Type something..." }],
       },
     ]
   );
@@ -33,34 +33,42 @@ export default function SlateEditor() {
     {
       label: "Text",
       value: "paragraph",
+      subtext: "Just start writing with plain text.",
     },
     {
       label: "Heading 1",
       value: "heading-one",
+      subtext: "Big section heading.",
     },
     {
       label: "Heading 2",
       value: "heading-two",
+      subtext: "Medium section heading.",
     },
     {
       label: "Heading 3",
       value: "heading-three",
+      subtext: "Small section heading.",
     },
     {
       label: "Bulleted list",
       value: "bulleted-list",
+      subtext: "Create a simple bulleted list.",
     },
     {
       label: "Numbered list",
       value: "numbered-list",
+      subtext: "Create a list with numbering.",
     },
     {
-      label: "Check list",
+      label: "To-do list",
       value: "check-list",
+      subtext: "Track tasks with a to-do list.",
     },
     {
       label: "Quote",
       value: "block-quote",
+      subtext: "Capture a quote.",
     },
   ];
   const [menuOptions, setMenuOptions] = useState(allowedTags);
@@ -84,17 +92,19 @@ export default function SlateEditor() {
   );
 
   const numberedListElement = (props) => (
-    <ol {...props.attributes} className="editor__styles--lists">
+    <ol {...props.attributes} className="editor__styles--numbered">
       {props.children}
     </ol>
   );
 
   const bulletedListElement = (props) => (
-    <ul {...props.attributes}>{props.children}</ul>
+    <ul {...props.attributes} className="editor__styles--bulleted">
+      {props.children}
+    </ul>
   );
 
   const listItemElement = (props) => (
-    <li {...props.attributes} className="editor__styles--lists">
+    <li {...props.attributes} className="editor__styles--bulleted">
       {props.children}
     </li>
   );
@@ -260,7 +270,7 @@ export default function SlateEditor() {
         x = rect.top;
         y = rect.left;
       }
-      return { top: x > 120 ? x - 150 : x + 20, left: y };
+      return { top: x > 430 ? x - 250 : x + 20, left: y + 5 };
     } else {
       alert("Internal server error, please try again later");
     }
@@ -306,8 +316,14 @@ export default function SlateEditor() {
 
   const markdownListMenuOptions = menuOptions.map((item, key) => {
     return (
-      <MenuItem tabIndex="0" key={key} onClick={() => onClickMenu(item)}>
-        {item.label}
+      <MenuItem
+        tabIndex="0"
+        className="editor__menu--item"
+        key={key}
+        onClick={() => onClickMenu(item)}
+      >
+        <p className="editor__menu--item-label">{item.label}</p>
+        <p className="editor__menu--item-subtext">{item.subtext}</p>
       </MenuItem>
     );
   });
@@ -346,10 +362,20 @@ export default function SlateEditor() {
         const isList = LIST_TYPES.includes(editor.getFragment()[0].type);
         const isChecklist = editor.getFragment()[0].type === "check-list";
         if (isList) {
-          return Transforms.insertNodes(editor, {
-            type: "list-item",
-            children: [{ text: "" }],
-          });
+          const listLength =
+            editor.children[editor.selection.anchor.path[0]].children[
+              editor.selection.anchor.path[1]
+            ].children[0].text.length;
+          const listType = editor.getFragment()[0].type;
+          if (listLength === 0) {
+            event.preventDefault();
+            toggleBlock(editor, listType);
+          } else {
+            return Transforms.insertNodes(editor, {
+              type: "list-item",
+              children: [{ text: "" }],
+            });
+          }
         } else if (isChecklist) {
           return Transforms.insertNodes(editor, {
             type: "check-list",
