@@ -5,13 +5,13 @@ import auth from "hoc/auth";
 import axios from "axios";
 import Error from "components/Error/Error";
 
-function CheckToken(accessToken, refreshToken) {
+async function CheckToken(accessToken, refreshToken) {
   var isAccessTokenExpired = isExpired(accessToken);
   var isRefreshTokenExpired = isExpired(refreshToken);
   if (isAccessTokenExpired === false) {
     return true;
   } else if (isRefreshTokenExpired === false) {
-    axios
+    await axios
       .post(`${process.env.REACT_APP_SERVER_LINK}/refresh-token`, {
         refreshToken: refreshToken,
       })

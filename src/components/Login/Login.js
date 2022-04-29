@@ -74,7 +74,7 @@ export default function Login() {
             localStorage.setItem("accessToken", res.data["access_token"]);
             localStorage.setItem("refreshToken", res.data["refresh_token"]);
             setLoading(false);
-            navigate("/home");
+            navigate("/documents");
           });
         }
       } catch (err) {
@@ -191,7 +191,7 @@ export default function Login() {
         <h1 className="login__content--header">Log in</h1>
         {passwordReset ? resetPasswordForm() : loginForm()}
       </div>
-      {localStorage.accessToken ? <Navigate to="/home" /> : null}
+      {localStorage.accessToken ? <Navigate to="/documents" /> : null}
     </div>
   );
 }

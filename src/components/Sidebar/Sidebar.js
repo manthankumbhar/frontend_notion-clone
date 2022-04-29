@@ -1,11 +1,12 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "components/Sidebar/Sidebar.scss";
 import auth from "hoc/auth";
 import logo from "UI/logo.svg";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-export default function Sidebar() {
+export default function Sidebar({ options }) {
   const navigate = useNavigate();
   const logout = useCallback(() => {
     auth.logout(() => {
@@ -14,23 +15,34 @@ export default function Sidebar() {
       navigate("/");
     });
   }, [navigate]);
-  const optionsDemo = [
-    { name: "weekly progress", id: "abc" },
-    { name: "cool talks", id: "def" },
-    { name: "In the middle of june", id: "ghi" },
-  ];
-  const [menuOptions, setMenuOptions] = useState(optionsDemo);
-  console.log(setMenuOptions);
-  // will set it once api starts working
+  const [menuOptions, setMenuOptions] = useState([]);
+
+  useEffect(() => {
+    setMenuOptions(options);
+  }, [options]);
+
+  const sidebarOnClick = useCallback(
+    (item) => {
+      console.log(`backend/document/${item.id} is clicked`);
+      navigate(`/documents/${item.id}`);
+    },
+    [navigate]
+  );
+
   const sidebarMenuOptions = menuOptions.map((item, key) => {
+    var url = document.URL;
+    var documentId = url.substring(url.lastIndexOf("/") + 1);
     return (
       <div
-        className="sidebar__menu--options"
+        className={
+          item.id === documentId
+            ? "sidebar__menu--options sidebar__menu--options--active"
+            : "sidebar__menu--options"
+        }
         key={key}
-        onClick={() => console.log(`backend/document/${item.id} is clicked`)}
-        // will convert it to another function and add useCallback
+        onClick={() => sidebarOnClick(item)}
       >
-        {item.name}
+        {item.name == null ? "Untitled" : null}
       </div>
     );
   });
@@ -39,16 +51,46 @@ export default function Sidebar() {
     return <div>{sidebarMenuOptions}</div>;
   }, [sidebarMenuOptions]);
 
+  const newDocBtnOnClick = useCallback(async () => {
+    console.log("btn clicked");
+    try {
+      var config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      };
+      var res = await axios.post(
+        `${process.env.REACT_APP_SERVER_LINK}/documents`,
+        {},
+        config
+      );
+      var parsedData = JSON.parse(res.data);
+      var id = parsedData["id"];
+      console.log(parsedData);
+      setMenuOptions([...menuOptions, { id: id, name: parsedData["name"] }]);
+      navigate(`/documents/${id}`);
+      return res.data;
+    } catch (err) {
+      console.log(err.message);
+      navigate("/error");
+    }
+  }, [menuOptions, navigate]);
+
   return (
     <div className="sidebar">
-      <Link to="/" className="sidebar__logo">
+      <Link to="/documents" className="sidebar__logo">
         <img src={logo} alt="logo" />
       </Link>
       <div className="sidebar__menu">
         <div className="sidebar__menu--headers">
           <p className="sidebar__menu--headers--title">Documents:</p>
-          <button className="sidebar__menu--headers--btn">+</button>
-          {/* will set onClick functionalities once api is done */}
+          <button
+            className="sidebar__menu--headers--btn"
+            onClick={newDocBtnOnClick}
+          >
+            +
+          </button>
         </div>
         {renderSidebarMenu()}
       </div>

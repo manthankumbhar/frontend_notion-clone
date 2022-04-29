@@ -12,8 +12,11 @@ export default function App() {
       <Routes>
         <Route exact path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/home" element={<PrivateRoute />}>
-          <Route path="/home" element={<Home />} />
+        <Route path="/documents/:id" element={<PrivateRoute />}>
+          <Route path="/documents/:id" element={<Home />} />
+        </Route>
+        <Route path="/documents" element={<PrivateRoute />}>
+          <Route path="/documents" element={<Home />} />
         </Route>
         <Route path="*" element={<Error />} />
       </Routes>
