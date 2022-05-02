@@ -12,9 +12,11 @@ export default function Home() {
   // console.log(id);
   const [options, setOptions] = useState([]);
   useEffect(() => {
-    const documentsArray = async () => {
-      var userId = decodeToken(localStorage.getItem("accessToken"))["user_id"];
+    async function documentsArray() {
       try {
+        var userId = await decodeToken(localStorage.getItem("accessToken"))[
+          "user_id"
+        ];
         var config = {
           headers: {
             "Content-Type": "application/json",
@@ -25,32 +27,63 @@ export default function Home() {
           `${process.env.REACT_APP_SERVER_LINK}/documents?user_id=${userId}`,
           config
         );
-        var id = await res.data[0]["id"];
-        navigate(`/documents/${id}`);
         setOptions(res.data);
-        // var url = document.URL;
-        // var id = url.substring(url.lastIndexOf("/") + 1);
+        if (res.data === []) {
+          var config_2 = {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          };
+          var res_2 = await axios.post(
+            `${process.env.REACT_APP_SERVER_LINK}/documents`,
+            {},
+            config_2
+          );
+          var parsedData = JSON.parse(res_2.data);
+          var id_2 = parsedData["id"];
+          navigate(`/documents/${id_2}`);
+          return res_2.data;
+        }
+        // var id = res.data[0]["id"];
+        // navigate(`/documents/${id}`);
+        var url = document.URL;
+        var id = url.substring(url.lastIndexOf("/") + 1);
+        var arr = [];
+        await res.data.map((x) => arr.push(x["id"]));
+        if (arr.includes(id)) {
+          return navigate(`/documents/${id}`);
+        } else {
+          return navigate(`/documents/${res.data[0]["id"]}`);
+        }
+        // if (x["id"] === id) {
+        // navigate(`/documents/${id}`);
+        // } else {
+        // return navigate(`/documents/${x["id"]}`);
+        // }
+        // return null;
+        // });
         // var arr = [];
-        // for (let i in res.data) {
-        // arr.push(res.data[i]["id"]);
-        // if (res.data[i]["id"].includes(id)) {
-        //   return navigate(`/documents/${id}`);
+        // for (let i of res.data) {
+        //   arr.push(i['id'])
+        //   // console.log(i["id"]);
         // }
-        // else {
-        // console.log("passing");
-        // }
+        // if () {
+        //   navigate(`/documents/${id}`);
+        // } else {
+        //   navigate(`/documents/${res.data[0]["id"]}`);
         // }
         // if (arr.includes(id)) {
         // navigate(`/documents/${id}`);
         // } else {
         // }
-        return res.data;
+        // return null;
       } catch (err) {
         console.log(err.message);
       }
-    };
+    }
     documentsArray();
-  }, []);
+  }, [navigate]);
 
   // useEffect(() => {
   //   documentsArray();

@@ -77,10 +77,10 @@ export default function SlateEditor({ documentId }) {
   // JSON.parse(getData.data)
   // ]
 
-  useEffect(() => {
-    // editor.children = JSON.parse(localStorage.getItem(documentId));
-    console.log(content);
-  }, [content, documentId, editor]);
+  // useEffect(() => {
+  //   // editor.children = JSON.parse(localStorage.getItem(documentId));
+  //   console.log(content);
+  // }, [content, documentId, editor]);
 
   useEffect(() => {
     var getData = async () => {
@@ -102,14 +102,31 @@ export default function SlateEditor({ documentId }) {
         // }
         var parsedData = JSON.parse(res.data)["data"];
         console.log(parsedData);
-        sessionStorage.setItem(`${documentId}`, parsedData);
+        if (parsedData === null) {
+          var data = [
+            {
+              type: "paragraph",
+              children: [{ text: "Type something..." }],
+            },
+          ];
+          sessionStorage.setItem(`${documentId}`, JSON.stringify(data));
+          // editor.children = data;
+          setContent(data);
+          return data;
+        } else {
+          sessionStorage.setItem(`${documentId}`, parsedData);
+          setContent(parsedData);
+          // editor.children = parsedData;
+          return parsedData;
+        }
+        // console.log(parsedData);
         // setId(documentId);
 
-        setContent(parsedData);
+        // setContent(parsedData);
         // editor.children = JSON.parse(localStorage.getItem(documentId));
         // ReactEditor.focus(editor);
         // editor.children = parsedData;
-        return parsedData;
+        // return parsedData;
       } catch (error) {
         console.log("sigh");
         navigate("/error");
@@ -119,8 +136,14 @@ export default function SlateEditor({ documentId }) {
   }, [navigate, documentId, editor]);
 
   useEffect(() => {
-    editor.children = JSON.parse(sessionStorage.getItem(documentId));
-  }, [documentId, editor]);
+    editor.children = JSON.parse(sessionStorage.getItem(documentId)) ||
+      JSON.parse(content) || [
+        {
+          type: "paragraph",
+          children: [{ text: "Type something..." }],
+        },
+      ];
+  }, [documentId, editor, content]);
 
   const LIST_TYPES = useMemo(() => ["numbered-list", "bulleted-list"], []);
   const [showMenu, setShowMenu] = useState(false);
