@@ -19,12 +19,13 @@ import "rc-menu/assets/index.css";
 export default function SlateEditor() {
   const editor = useMemo(() => withReact(createEditor()), []);
   const [value, setValue] = useState(
-    JSON.parse(localStorage.getItem("content")) || [
-      {
-        type: "paragraph",
-        children: [{ text: "Type something..." }],
-      },
-    ]
+    JSON.parse(localStorage.getItem("content")) ||
+      [
+        // {
+        //   type: "paragraph",
+        //   children: [{ text: "Type something..." }],
+        // },
+      ]
   );
   const LIST_TYPES = useMemo(() => ["numbered-list", "bulleted-list"], []);
   const [showMenu, setShowMenu] = useState(false);
@@ -270,7 +271,7 @@ export default function SlateEditor() {
         x = rect.top;
         y = rect.left;
       }
-      return { top: x > 430 ? x - 250 : x + 20, left: y + 5 };
+      return { top: x > 350 ? x - 350 : x + 20, left: y + 5 };
     } else {
       alert("Internal server error, please try again later");
     }

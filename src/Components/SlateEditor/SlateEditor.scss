@@ -58,8 +58,9 @@
     background-color: #252525;
     z-index: 999;
     position: absolute;
-    width: 23rem;
-    height: 20rem;
+    border-radius: 1rem;
+    width: 25rem;
+    height: 30rem;
     overflow-y: scroll;
     cursor: pointer;
 
@@ -71,14 +72,14 @@
 
       &-label {
         display: block;
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         margin: 0 0 5px 0;
         font-weight: bold;
       }
 
       &-subtext {
         display: block;
-        font-size: 1rem;
+        font-size: 1.4rem;
         color: lightgrey;
         margin: 0;
       }
@@ -91,7 +92,12 @@
   }
 }
 
-.rc-menu-item-active {
-  background-color: #404040 !important;
-  outline: none !important;
+.rc-menu {
+  box-shadow: 0 0 10px 1px #d9d9d9 !important;
+  border-radius: 10px !important;
+
+  &-item-active {
+    background-color: #404040 !important;
+    outline: none !important;
+  }
 }

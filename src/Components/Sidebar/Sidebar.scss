@@ -8,7 +8,7 @@ $background-color: #202020;
   justify-content: space-between;
 
   &__logo {
-    margin: 2rem 0 2rem 2rem;
+    margin: 2rem auto;
     display: flex;
 
     &--icon {
@@ -24,7 +24,7 @@ $background-color: #202020;
     width: 7rem;
     background-color: $background-color;
     border-radius: 3px;
-    margin: 1.5rem 0rem 1.5rem 1.5rem;
+    margin: 1.5rem auto;
     cursor: pointer;
     color: white;
     border: none;
