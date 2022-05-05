@@ -17,6 +17,7 @@ import Menu, { Item as MenuItem } from "rc-menu";
 import "rc-menu/assets/index.css";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { CircularProgress } from "@mui/material";
 
 export default function SlateEditor({ documentId }) {
   const navigate = useNavigate();
@@ -62,6 +63,19 @@ export default function SlateEditor({ documentId }) {
   // var [id, setId] = useState("");
 
   const [content, setContent] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    editor.children = JSON.parse(sessionStorage.getItem(documentId)) || [
+      {
+        type: "paragraph",
+        children: [{ text: "" }],
+      },
+    ];
+    // console.log(editor.children);
+    setLoading(false);
+  }, [documentId, editor, content]);
+
   // {
   //   type: "paragraph",
   //   children: [{ text: "Type something..." }],
@@ -85,6 +99,7 @@ export default function SlateEditor({ documentId }) {
   useEffect(() => {
     var getData = async () => {
       try {
+        setLoading(true);
         // "http://localhost:5000/documents/c54b8f74-10d1-4117-a349-d11180222468",
         // Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMGQ3MjgzY2EtMGU3Ny00OWY0LTlkNTctM2EzMzc2ZWU0NmEzIiwiZXhwIjoxNjgyNTMyODM4fQ._MCS6cG_9eWi9AhcvA2FaQKn_UETH73BHrgXtX29R24`,
         var res = await axios.get(
@@ -112,10 +127,12 @@ export default function SlateEditor({ documentId }) {
           sessionStorage.setItem(`${documentId}`, JSON.stringify(data));
           // editor.children = data;
           setContent(data);
+          setLoading(false);
           return data;
         } else {
           sessionStorage.setItem(`${documentId}`, parsedData);
           setContent(parsedData);
+          setLoading(false);
           // editor.children = parsedData;
           return parsedData;
         }
@@ -128,22 +145,13 @@ export default function SlateEditor({ documentId }) {
         // editor.children = parsedData;
         // return parsedData;
       } catch (error) {
+        setLoading(false);
         console.log("sigh");
         navigate("/error");
       }
     };
     getData();
   }, [navigate, documentId, editor]);
-
-  useEffect(() => {
-    editor.children = JSON.parse(sessionStorage.getItem(documentId)) ||
-      JSON.parse(content) || [
-        {
-          type: "paragraph",
-          children: [{ text: "Type something..." }],
-        },
-      ];
-  }, [documentId, editor, content]);
 
   const LIST_TYPES = useMemo(() => ["numbered-list", "bulleted-list"], []);
   const [showMenu, setShowMenu] = useState(false);
@@ -612,8 +620,6 @@ export default function SlateEditor({ documentId }) {
       <Slate
         editor={editor}
         value={content}
-        // children={value}
-        // initialValue={value}
         onChange={(newValue) => editorOnChange(newValue)}
       >
         <RenderMarkdownListMenu />
