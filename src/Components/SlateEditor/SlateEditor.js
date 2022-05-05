@@ -378,11 +378,22 @@ export default function SlateEditor() {
             });
           }
         } else if (isChecklist) {
-          return Transforms.insertNodes(editor, {
-            type: "check-list",
-            children: [{ text: "" }],
-            checked: false,
-          });
+          const listLength =
+            editor.children[editor.selection.anchor.path[0]].children[
+              editor.selection.anchor.path[1]
+            ].text.length;
+          const listType = editor.getFragment()[0].type;
+          console.log(listType);
+          if (listLength === 0) {
+            event.preventDefault();
+            toggleBlock(editor, listType);
+          } else {
+            return Transforms.insertNodes(editor, {
+              type: "check-list",
+              children: [{ text: "" }],
+              checked: false,
+            });
+          }
         } else {
           Transforms.insertNodes(editor, {
             type: "paragraph",
