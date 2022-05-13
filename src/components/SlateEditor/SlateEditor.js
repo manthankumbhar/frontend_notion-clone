@@ -22,46 +22,6 @@ import { CircularProgress } from "@mui/material";
 export default function SlateEditor({ documentId }) {
   const navigate = useNavigate();
   const editor = useMemo(() => withReact(createEditor()), []);
-  // var getData = useCallback(async () => {
-  //   try {
-  //     var res = await axios.get(
-  //       // `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
-  //       "http://localhost:5000/documents/c54b8f74-10d1-4117-a349-d11180222468",
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMGQ3MjgzY2EtMGU3Ny00OWY0LTlkNTctM2EzMzc2ZWU0NmEzIiwiZXhwIjoxNjgyNTMyODM4fQ._MCS6cG_9eWi9AhcvA2FaQKn_UETH73BHrgXtX29R24`,
-  //           // Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //         },
-  //       }
-  //     );
-  //   } catch (error) {
-  //     console.log("sigh");
-  //     navigate("/error");
-  //   }
-  //   console.log(res.data["data"]);
-  //   // console.log(typeof res.data);
-  //   // console.log(JSON.parse(res.data));
-  //   // console.log(typeof JSON.parse(res.data));
-
-  //   // var a = {
-  //   //   data: '[{"type":"paragraph","children":[{"text":"A line of text in a paragraph."}]},{"type":"paragraph","children":[{"text":""}]}]',
-  //   // };
-  //   // console.log(a["data"]);
-  //   // console.log(typeof JSON.parse(a["data"]));
-
-  //   // var b = '{'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x7f4d23a84070>, 'data': '[{"type":"paragraph","children":[{"text":"A line of text in a paragraph."}]}]', 'created_at': datetime.datetime(2022, 4, 22, 19, 25, 31, 76133), 'name': None, 'id': UUID('be938fbf-2865-4eb6-9c3e-5b6ef6975cfc'), 'user_id': UUID('a52edf0b-d0a2-4341-8815-ea187f39e832'), 'updated_at': datetime.datetime(2022, 4, 22, 19, 25, 31, 76133)}'
-  //   // console.log(b);
-  //   // console.log(typeof b);
-  //   // setValue(res.data["data"]);
-  //   return res.data["data"];
-  // }, [navigate]);
-  // getData();
-
-  // var url = document.URL;
-  // var id = url.substring(url.lastIndexOf("/") + 1);
-  // var [id, setId] = useState("");
-
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -73,35 +33,12 @@ export default function SlateEditor({ documentId }) {
       },
     ];
     setLoading(false);
-    // console.log(editor.children);
   }, [documentId, editor, content]);
-
-  // {
-  //   type: "paragraph",
-  //   children: [{ text: "Type something..." }],
-  // },
-  // editor.children = value;
-  // || [
-  //   // getData()
-  //   // JSON.parse()
-  //   {
-  //     type: "paragraph",
-  //     children: [{ text: "Type something..." }],
-  //   },
-  // JSON.parse(getData.data)
-  // ]
-
-  // useEffect(() => {
-  //   // editor.children = JSON.parse(localStorage.getItem(documentId));
-  //   console.log(content);
-  // }, [content, documentId, editor]);
 
   useEffect(() => {
     var getData = async () => {
       try {
         setLoading(true);
-        // "http://localhost:5000/documents/c54b8f74-10d1-4117-a349-d11180222468",
-        // Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMGQ3MjgzY2EtMGU3Ny00OWY0LTlkNTctM2EzMzc2ZWU0NmEzIiwiZXhwIjoxNjgyNTMyODM4fQ._MCS6cG_9eWi9AhcvA2FaQKn_UETH73BHrgXtX29R24`,
         var res = await axios.get(
           `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
           {
@@ -111,10 +48,6 @@ export default function SlateEditor({ documentId }) {
             },
           }
         );
-        // if (res.status === 200) {
-        // console.log(typeof res.data);
-        // editor.children = parsedData["data"];
-        // }
         var parsedData = JSON.parse(res.data)["data"];
         console.log(parsedData);
         if (parsedData === null) {
@@ -126,24 +59,14 @@ export default function SlateEditor({ documentId }) {
           ];
           sessionStorage.setItem(`${documentId}`, JSON.stringify(data));
           setContent(data);
-          // editor.children = data;
           setLoading(false);
           return data;
         } else {
           sessionStorage.setItem(`${documentId}`, parsedData);
           setContent(parsedData);
-          // editor.children = parsedData;
           setLoading(false);
           return parsedData;
         }
-        // console.log(parsedData);
-        // setId(documentId);
-
-        // setContent(parsedData);
-        // editor.children = JSON.parse(localStorage.getItem(documentId));
-        // ReactEditor.focus(editor);
-        // editor.children = parsedData;
-        // return parsedData;
       } catch (error) {
         console.log("sigh");
         setLoading(false);
@@ -190,33 +113,9 @@ export default function SlateEditor({ documentId }) {
       value: "block-quote",
     },
   ];
+  //eslint-disable-next-line
   const [menuOptions, setMenuOptions] = useState(allowedTags);
-  // console.log(setMenuOptions);
   const menuFocus = createRef();
-
-  // useEffect(() => {
-  //   var getData = async () => {
-  //     var config = {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Accept: "application/json",
-  //         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-  //       },
-  //     };
-  //     var res = await axios.get(
-  //       `${process.env.REACT_APP_SERVER_LINK}/documents/be938fbf-2865-4eb6-9c3e-5b6ef6975cfc`,
-  //       config
-  //     );
-  //     console.log(typeof res.data);
-  //     // console.log(JSON.stringify(res.data));
-  //     // console.log(typeof JSON.parse(res.data));
-  //     var cool =
-  //       '[{"type":"paragraph","children":[{"text":"A line of text in a paragraph, coooool."}]}]';
-  //     return cool;
-  //   };
-  //   getData();
-  //   // setValue(getData()["data"]);
-  // }, []);
 
   useEffect(() => {
     menuFocus.current?.focus();
@@ -589,8 +488,6 @@ export default function SlateEditor({ documentId }) {
 
   const editorOnChange = useCallback(
     (newValue) => {
-      // "http://localhost:5000/documents/c54b8f74-10d1-4117-a349-d11180222468",
-      // Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMGQ3MjgzY2EtMGU3Ny00OWY0LTlkNTctM2EzMzc2ZWU0NmEzIiwiZXhwIjoxNjgyNTMyODM4fQ._MCS6cG_9eWi9AhcvA2FaQKn_UETH73BHrgXtX29R24`,
       setContent(newValue);
       const isAstChange = editor.operations.some(
         (op) => "set_selection" !== op.type

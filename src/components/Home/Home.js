@@ -10,8 +10,6 @@ import { CircularProgress } from "@mui/material";
 export default function Home() {
   const navigate = useNavigate();
   var { id } = useParams();
-  // make the call here only and get the first id from the response
-  // console.log(id);
   const [options, setOptions] = useState([]);
   const [documentId, setdocumentId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,7 +32,6 @@ export default function Home() {
           `${process.env.REACT_APP_SERVER_LINK}/documents?user_id=${userId}`,
           config
         );
-        // setOptions(res.data);
         if (res.data.length === 0) {
           console.log("passing new doc creation");
           var config_2 = {
@@ -54,10 +51,6 @@ export default function Home() {
           navigate(`/documents/${id_2}`);
           return res_2.data;
         }
-        // var id = res.data[0]["id"];
-        // navigate(`/documents/${id}`);
-        // var url = document.URL;
-        // var id = url.substring(url.lastIndexOf("/") + 1);
         setOptions(res.data);
         var arr = [];
         await res.data.map((x) => arr.push(x["id"]));
@@ -70,28 +63,6 @@ export default function Home() {
           navigate(`/documents/${res.data[0]["id"]}`);
           setLoading(false);
         }
-        // if (x["id"] === id) {
-        // navigate(`/documents/${id}`);
-        // } else {
-        // return navigate(`/documents/${x["id"]}`);
-        // }
-        // return null;
-        // });
-        // var arr = [];
-        // for (let i of res.data) {
-        //   arr.push(i['id'])
-        //   // console.log(i["id"]);
-        // }
-        // if () {
-        //   navigate(`/documents/${id}`);
-        // } else {
-        //   navigate(`/documents/${res.data[0]["id"]}`);
-        // }
-        // if (arr.includes(id)) {
-        // navigate(`/documents/${id}`);
-        // } else {
-        // }
-        // return null;
       } catch (err) {
         console.log(err.message);
         navigate("/error");
@@ -100,11 +71,6 @@ export default function Home() {
     documentsArray();
   }, [navigate, id]);
 
-  // useEffect(() => {
-  //   documentsArray();
-  // }, [documentsArray]);
-  // get first id and redirect to that id
-  // navigate(`/documents/${optionsDemo[0]["id"]}`);
   return (
     <div className="home">
       <Sidebar options={options} />
@@ -115,8 +81,6 @@ export default function Home() {
       ) : documentId !== "" ? (
         <SlateEditor documentId={documentId} />
       ) : null}
-      {/* <SlateEditor documentId={documentId} /> */}
-      {/* <SlateEditor documentId={documentId.length === 0 ? null : documentId} /> */}
     </div>
   );
 }
