@@ -108,7 +108,7 @@ export default function Signup() {
           Already a user?
         </Link>
       </form>
-      {localStorage.accessToken ? <Navigate to="/home" /> : null}
+      {localStorage.accessToken ? <Navigate to="/documents" /> : null}
     </div>
   );
 }

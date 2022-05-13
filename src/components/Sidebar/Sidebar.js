@@ -82,7 +82,10 @@ export default function Sidebar({ options }) {
       <Link to="/documents" className="sidebar__logo">
         <img src={logo} alt="logo" />
       </Link>
-      <div className="sidebar__menu">
+      <div
+        className="sidebar__menu"
+        style={menuOptions.length > 10 ? { overflowY: "scroll" } : null}
+      >
         <div className="sidebar__menu--headers">
           <p className="sidebar__menu--headers--title">Documents:</p>
           <button

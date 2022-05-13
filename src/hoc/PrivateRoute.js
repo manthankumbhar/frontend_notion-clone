@@ -6,6 +6,7 @@ import axios from "axios";
 import Error from "components/Error/Error";
 
 async function CheckToken(accessToken, refreshToken) {
+  console.log("passing private route");
   var isAccessTokenExpired = isExpired(accessToken);
   var isRefreshTokenExpired = isExpired(refreshToken);
   if (isAccessTokenExpired === false) {

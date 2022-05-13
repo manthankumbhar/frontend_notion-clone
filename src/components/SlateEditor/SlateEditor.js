@@ -63,17 +63,17 @@ export default function SlateEditor({ documentId }) {
   // var [id, setId] = useState("");
 
   const [content, setContent] = useState([]);
-  const [loading, setLoading] = useState(true);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
+    setLoading(true);
     editor.children = JSON.parse(sessionStorage.getItem(documentId)) || [
       {
         type: "paragraph",
         children: [{ text: "" }],
       },
     ];
-    // console.log(editor.children);
     setLoading(false);
+    // console.log(editor.children);
   }, [documentId, editor, content]);
 
   // {
@@ -121,19 +121,19 @@ export default function SlateEditor({ documentId }) {
           var data = [
             {
               type: "paragraph",
-              children: [{ text: "Type something..." }],
+              children: [{ text: "" }],
             },
           ];
           sessionStorage.setItem(`${documentId}`, JSON.stringify(data));
-          // editor.children = data;
           setContent(data);
+          // editor.children = data;
           setLoading(false);
           return data;
         } else {
           sessionStorage.setItem(`${documentId}`, parsedData);
           setContent(parsedData);
-          setLoading(false);
           // editor.children = parsedData;
+          setLoading(false);
           return parsedData;
         }
         // console.log(parsedData);
@@ -145,8 +145,8 @@ export default function SlateEditor({ documentId }) {
         // editor.children = parsedData;
         // return parsedData;
       } catch (error) {
-        setLoading(false);
         console.log("sigh");
+        setLoading(false);
         navigate("/error");
       }
     };
@@ -614,7 +614,6 @@ export default function SlateEditor({ documentId }) {
     [documentId, editor]
   );
 
-  // editor.children = content;
   return (
     <div className="editor">
       <Slate
@@ -623,12 +622,19 @@ export default function SlateEditor({ documentId }) {
         onChange={(newValue) => editorOnChange(newValue)}
       >
         <RenderMarkdownListMenu />
-        <Editable
-          className="editor__area"
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          onKeyDown={editorOnKeyDown}
-        />
+        {loading ? (
+          <div className="editor__loading">
+            <CircularProgress size={40} color="secondary" />
+          </div>
+        ) : (
+          <Editable
+            className="editor__area"
+            renderElement={renderElement}
+            renderLeaf={renderLeaf}
+            onKeyDown={editorOnKeyDown}
+            placeholder={"Type '/' to checkout the magical options."}
+          />
+        )}
       </Slate>
     </div>
   );
