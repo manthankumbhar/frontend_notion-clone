@@ -49,7 +49,6 @@ export default function SlateEditor({ documentId }) {
           }
         );
         var parsedData = JSON.parse(res.data)["data"];
-        console.log(parsedData);
         if (parsedData === null) {
           var data = [
             {

@@ -14,7 +14,6 @@ export default function Home() {
   const [documentId, setdocumentId] = useState("");
   const [loading, setLoading] = useState(false);
 
-  console.log(documentId);
   useEffect(() => {
     async function documentsArray() {
       try {
@@ -33,7 +32,6 @@ export default function Home() {
           config
         );
         if (res.data.length === 0) {
-          console.log("passing new doc creation");
           var config_2 = {
             headers: {
               "Content-Type": "application/json",
@@ -46,7 +44,6 @@ export default function Home() {
             config_2
           );
           var parsedData = JSON.parse(res_2.data);
-          console.log(res_2.data);
           var id_2 = parsedData["id"];
           navigate(`/documents/${id_2}`);
           return res_2.data;

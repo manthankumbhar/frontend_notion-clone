@@ -23,7 +23,6 @@ export default function Sidebar({ options }) {
 
   const sidebarOnClick = useCallback(
     (item) => {
-      console.log(`backend/document/${item.id} is clicked`);
       navigate(`/documents/${item.id}`);
     },
     [navigate]
@@ -67,12 +66,10 @@ export default function Sidebar({ options }) {
       );
       var parsedData = JSON.parse(res.data);
       var id = parsedData["id"];
-      console.log(parsedData);
       setMenuOptions([...menuOptions, { id: id, name: parsedData["name"] }]);
       navigate(`/documents/${id}`);
       return res.data;
     } catch (err) {
-      console.log(err.message);
       navigate("/error");
     }
   }, [menuOptions, navigate]);
