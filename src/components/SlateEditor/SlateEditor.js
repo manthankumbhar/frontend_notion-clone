@@ -150,12 +150,11 @@ export default function SlateEditor({ documentId }) {
 
   const onChangeChecklist = useCallback(
     (e, props) => {
+      const path = ReactEditor.findPath(editor, props.element);
       const newProperties = {
-        type: "check-list",
-        children: props.children,
         checked: e.target.checked,
       };
-      Transforms.setNodes(editor, newProperties);
+      Transforms.setNodes(editor, newProperties, { at: path });
     },
     [editor]
   );
