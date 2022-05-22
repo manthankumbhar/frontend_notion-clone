@@ -1,6 +1,6 @@
 .editor {
   flex: 1;
-  overflow-y: scroll;
+  overflow: hidden scroll;
 
   &__area {
     padding: 3rem;
@@ -8,7 +8,7 @@
     text-align: left;
     background-color: #191919;
     color: #f2f2f2;
-    min-height: 100vh;
+    min-height: 100vh !important;
     line-height: 1;
   }
 
@@ -25,8 +25,12 @@
       margin-left: 0;
     }
 
-    &--lists {
-      margin: 8px 2px;
+    &--numbered {
+      margin: 8px 0px 8px -5px;
+    }
+
+    &--bulleted {
+      margin: 8px 0px 8px -5px;
     }
 
     &--checklist {
@@ -51,12 +55,49 @@
 
   &__menu {
     opacity: 1;
-    background-color: #191919;
+    background-color: #252525;
     z-index: 999;
     position: absolute;
-    width: 12rem;
-    height: 10rem;
+    border-radius: 1rem;
+    width: 25rem;
+    height: 30rem;
     overflow-y: scroll;
     cursor: pointer;
+
+    &--item {
+      padding: 0;
+      margin: 0;
+      color: white;
+      text-align: left;
+
+      &-label {
+        display: block;
+        font-size: 1.8rem;
+        margin: 0 0 5px 0;
+        font-weight: bold;
+      }
+
+      &-subtext {
+        display: block;
+        font-size: 1.4rem;
+        color: lightgrey;
+        margin: 0;
+      }
+
+      &:hover,
+      &:active {
+        background-color: #404040;
+      }
+    }
+  }
+}
+
+.rc-menu {
+  box-shadow: 0 0 10px 1px #d9d9d9 !important;
+  border-radius: 10px !important;
+
+  &-item-active {
+    background-color: #404040 !important;
+    outline: none !important;
   }
 }

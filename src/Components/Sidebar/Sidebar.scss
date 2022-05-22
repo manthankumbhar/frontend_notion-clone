@@ -1,17 +1,18 @@
+$background-color: #202020;
+
 .sidebar {
-  background-color: #202020;
+  background-color: $background-color;
   width: 17%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
   &__logo {
-    margin: 3rem 0rem 3rem 3rem;
-
+    margin: 2rem auto;
     display: flex;
-    align-self: start;
 
     &--icon {
+      width: 9rem;
       height: 5rem;
     }
   }
@@ -19,19 +20,18 @@
   &__btn {
     font-size: 1.4rem;
     font-weight: 600;
-    height: 4rem;
-    background-color: #fdf5f2;
+    height: 3rem;
+    width: 7rem;
+    background-color: $background-color;
     border-radius: 3px;
-    margin: 1rem;
+    margin: 1.5rem auto;
     cursor: pointer;
-    color: #eb7575;
+    color: white;
     border: none;
-    box-shadow: rgb(15 15 15 / 10%) 0px 1px 2px,
-      rgb(235 87 87 / 30%) 0px 0px 0px 1px inset;
-    transition: all 0.3s;
+    transition: all 0.2s;
 
     &:hover {
-      background-color: #f8f8f8;
+      background-color: #303030;
     }
   }
 }
