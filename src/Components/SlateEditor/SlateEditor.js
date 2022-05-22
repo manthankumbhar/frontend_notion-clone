@@ -19,13 +19,12 @@ import "rc-menu/assets/index.css";
 export default function SlateEditor() {
   const editor = useMemo(() => withReact(createEditor()), []);
   const [value, setValue] = useState(
-    JSON.parse(localStorage.getItem("content")) ||
-      [
-        // {
-        //   type: "paragraph",
-        //   children: [{ text: "Type something..." }],
-        // },
-      ]
+    JSON.parse(localStorage.getItem("content")) || [
+      {
+        type: "paragraph",
+        children: [{ text: "" }],
+      },
+    ]
   );
   const LIST_TYPES = useMemo(() => ["numbered-list", "bulleted-list"], []);
   const [showMenu, setShowMenu] = useState(false);
@@ -112,12 +111,11 @@ export default function SlateEditor() {
 
   const onChangeChecklist = useCallback(
     (e, props) => {
+      const path = ReactEditor.findPath(editor, props.element);
       const newProperties = {
-        type: "check-list",
-        children: props.children,
         checked: e.target.checked,
       };
-      Transforms.setNodes(editor, newProperties);
+      Transforms.setNodes(editor, newProperties, { at: path });
     },
     [editor]
   );
@@ -496,6 +494,7 @@ export default function SlateEditor() {
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           onKeyDown={editorOnKeyDown}
+          placeholder={"Type '/' and let the magic begin :)"}
         />
       </Slate>
     </div>
