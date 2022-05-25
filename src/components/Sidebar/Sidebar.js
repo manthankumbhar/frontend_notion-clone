@@ -41,7 +41,7 @@ export default function Sidebar({ options }) {
         key={key}
         onClick={() => sidebarOnClick(item)}
       >
-        {item.name == null ? "Untitled" : null}
+        {item.name == null ? `Document ${key + 1}` : null}
       </div>
     );
   });
