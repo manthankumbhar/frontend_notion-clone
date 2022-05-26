@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-export default function Sidebar({ options }) {
+export default function Sidebar({ documentIdArray }) {
   const navigate = useNavigate();
   const logout = useCallback(() => {
     auth.logout(() => {
@@ -16,10 +16,14 @@ export default function Sidebar({ options }) {
     });
   }, [navigate]);
   const [menuOptions, setMenuOptions] = useState([]);
+  const accessToken = localStorage.accessToken;
+  if (accessToken === "" || accessToken === null || accessToken === undefined) {
+    navigate("/error");
+  }
 
   useEffect(() => {
-    setMenuOptions(options);
-  }, [options]);
+    setMenuOptions(documentIdArray);
+  }, [documentIdArray]);
 
   const sidebarOnClick = useCallback(
     (item) => {
@@ -56,7 +60,7 @@ export default function Sidebar({ options }) {
       var config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       };
       var res = await axios.post(
@@ -72,7 +76,7 @@ export default function Sidebar({ options }) {
     } catch (err) {
       navigate("/error");
     }
-  }, [menuOptions, navigate]);
+  }, [menuOptions, navigate, accessToken]);
 
   return (
     <div className="sidebar">

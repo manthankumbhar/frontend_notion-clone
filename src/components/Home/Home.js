@@ -13,18 +13,20 @@ export default function Home() {
   const [options, setOptions] = useState([]);
   const [documentId, setdocumentId] = useState("");
   const [loading, setLoading] = useState(false);
+  const accessToken = localStorage.accessToken;
+  if (accessToken === "" || accessToken === null || accessToken === undefined) {
+    navigate("/error");
+  }
 
   useEffect(() => {
     async function documentsArray() {
       try {
         setLoading(true);
-        var userId = await decodeToken(localStorage.getItem("accessToken"))[
-          "user_id"
-        ];
+        var userId = await decodeToken(accessToken)["user_id"];
         var config = {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         };
         var res = await axios.get(
@@ -35,7 +37,7 @@ export default function Home() {
           var config_2 = {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           };
           var res_2 = await axios.post(
@@ -66,11 +68,11 @@ export default function Home() {
       }
     }
     documentsArray();
-  }, [navigate, id]);
+  }, [navigate, id, accessToken]);
 
   return (
     <div className="home">
-      <Sidebar options={options} />
+      <Sidebar documentIdArray={options} />
       {loading ? (
         <div className="home__loading">
           <CircularProgress size={40} color="secondary" />

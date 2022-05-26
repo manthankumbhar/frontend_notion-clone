@@ -34,6 +34,10 @@ export default function SlateEditor({ documentId }) {
     ];
     setLoading(false);
   }, [documentId, editor, content]);
+  const accessToken = localStorage.accessToken;
+  if (accessToken === "" || accessToken === null || accessToken === undefined) {
+    navigate("/error");
+  }
 
   useEffect(() => {
     var getData = async () => {
@@ -44,7 +48,7 @@ export default function SlateEditor({ documentId }) {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -67,13 +71,12 @@ export default function SlateEditor({ documentId }) {
           return parsedData;
         }
       } catch (error) {
-        console.log("sigh");
         setLoading(false);
         navigate("/error");
       }
     };
     getData();
-  }, [navigate, documentId, editor]);
+  }, [navigate, documentId, editor, accessToken]);
 
   const LIST_TYPES = useMemo(() => ["numbered-list", "bulleted-list"], []);
   const [showMenu, setShowMenu] = useState(false);
@@ -496,7 +499,7 @@ export default function SlateEditor({ documentId }) {
         const config = {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         };
         axios.post(
@@ -506,7 +509,7 @@ export default function SlateEditor({ documentId }) {
         );
       }
     },
-    [documentId, editor]
+    [documentId, editor, accessToken]
   );
 
   return (
