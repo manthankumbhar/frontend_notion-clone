@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from "react";
-import "Components/Signup/Signup.scss";
+import "components/Signup/Signup.scss";
 import logo from "public/assets/arc_logo_full.svg";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import auth from "hoc/auth";
 import { CircularProgress } from "@mui/material";
-import SnackBar from "Components/SnackBar/SnackBar";
+import SnackBar from "components/SnackBar/SnackBar";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -108,7 +108,7 @@ export default function Signup() {
           Already a user?
         </Link>
       </form>
-      {localStorage.accessToken ? <Navigate to="/home" /> : null}
+      {localStorage.accessToken ? <Navigate to="/documents" /> : null}
     </div>
   );
 }

@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import "Components/SlateEditor/SlateEditor.scss";
+import "components/SlateEditor/SlateEditor.scss";
 import {
   createEditor,
   Editor,
@@ -15,17 +15,69 @@ import {
 import { Slate, Editable, withReact, ReactEditor } from "slate-react";
 import Menu, { Item as MenuItem } from "rc-menu";
 import "rc-menu/assets/index.css";
+import axios from "axios";
+import { useNavigate } from "react-router";
+import { CircularProgress } from "@mui/material";
 
-export default function SlateEditor() {
+export default function SlateEditor({ documentId }) {
+  const navigate = useNavigate();
   const editor = useMemo(() => withReact(createEditor()), []);
-  const [value, setValue] = useState(
-    JSON.parse(localStorage.getItem("content")) || [
+  const [content, setContent] = useState([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    setLoading(true);
+    editor.children = JSON.parse(sessionStorage.getItem(documentId)) || [
       {
         type: "paragraph",
         children: [{ text: "" }],
       },
-    ]
-  );
+    ];
+    setLoading(false);
+  }, [documentId, editor, content]);
+  const accessToken = localStorage.accessToken;
+  if (accessToken === "" || accessToken === null || accessToken === undefined) {
+    navigate("/error");
+  }
+
+  useEffect(() => {
+    var getData = async () => {
+      try {
+        setLoading(true);
+        var res = await axios.get(
+          `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        var parsedData = JSON.parse(res.data)["data"];
+        if (parsedData === null) {
+          var data = [
+            {
+              type: "paragraph",
+              children: [{ text: "" }],
+            },
+          ];
+          sessionStorage.setItem(`${documentId}`, JSON.stringify(data));
+          setContent(data);
+          setLoading(false);
+          return data;
+        } else {
+          sessionStorage.setItem(`${documentId}`, parsedData);
+          setContent(parsedData);
+          setLoading(false);
+          return parsedData;
+        }
+      } catch (error) {
+        setLoading(false);
+        navigate("/error");
+      }
+    };
+    getData();
+  }, [navigate, documentId, editor, accessToken]);
+
   const LIST_TYPES = useMemo(() => ["numbered-list", "bulleted-list"], []);
   const [showMenu, setShowMenu] = useState(false);
   const [coordinates, setCoordinates] = useState("");
@@ -71,8 +123,8 @@ export default function SlateEditor() {
       subtext: "Capture a quote.",
     },
   ];
+  //eslint-disable-next-line
   const [menuOptions, setMenuOptions] = useState(allowedTags);
-  console.log(setMenuOptions);
   const menuFocus = createRef();
 
   useEffect(() => {
@@ -472,30 +524,52 @@ export default function SlateEditor() {
     [editor, openMenu, LIST_TYPES, toggleBlock, toggleMark]
   );
 
+  const editorOnChange = useCallback(
+    (newValue) => {
+      setContent(newValue);
+      const isAstChange = editor.operations.some(
+        (op) => "set_selection" !== op.type
+      );
+      if (isAstChange) {
+        const content = JSON.stringify(newValue);
+        sessionStorage.setItem(documentId, content);
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+        axios.post(
+          `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
+          { data: content },
+          config
+        );
+      }
+    },
+    [documentId, editor, accessToken]
+  );
+
   return (
     <div className="editor">
       <Slate
         editor={editor}
-        value={value}
-        onChange={(newValue) => {
-          setValue(newValue);
-          const isAstChange = editor.operations.some(
-            (op) => "set_selection" !== op.type
-          );
-          if (isAstChange) {
-            const content = JSON.stringify(newValue);
-            localStorage.setItem("content", content);
-          }
-        }}
+        value={content}
+        onChange={(newValue) => editorOnChange(newValue)}
       >
         <RenderMarkdownListMenu />
-        <Editable
-          className="editor__area"
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          onKeyDown={editorOnKeyDown}
-          placeholder={"Type '/' and let the magic begin :)"}
-        />
+        {loading ? (
+          <div className="editor__loading">
+            <CircularProgress size={40} color="secondary" />
+          </div>
+        ) : (
+          <Editable
+            className="editor__area"
+            renderElement={renderElement}
+            renderLeaf={renderLeaf}
+            onKeyDown={editorOnKeyDown}
+            placeholder={"Type '/' to checkout the magical options."}
+          />
+        )}
       </Slate>
     </div>
   );

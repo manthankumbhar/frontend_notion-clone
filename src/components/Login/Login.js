@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from "react";
-import "Components/Login/Login.scss";
+import "components/Login/Login.scss";
 import logo from "public/assets/arc_logo_full.svg";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import axios from "axios";
 import auth from "hoc/auth";
 import { CircularProgress } from "@mui/material";
-import SnackBar from "Components/SnackBar/SnackBar";
+import SnackBar from "components/SnackBar/SnackBar";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -74,7 +74,7 @@ export default function Login() {
             localStorage.setItem("accessToken", res.data["access_token"]);
             localStorage.setItem("refreshToken", res.data["refresh_token"]);
             setLoading(false);
-            navigate("/home");
+            navigate("/documents");
           });
         }
       } catch (err) {
@@ -191,7 +191,7 @@ export default function Login() {
         <h1 className="login__content--header">Log in</h1>
         {passwordReset ? resetPasswordForm() : loginForm()}
       </div>
-      {localStorage.accessToken ? <Navigate to="/home" /> : null}
+      {localStorage.accessToken ? <Navigate to="/documents" /> : null}
     </div>
   );
 }

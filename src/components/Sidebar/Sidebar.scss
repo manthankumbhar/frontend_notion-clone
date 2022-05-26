@@ -1,0 +1,97 @@
+$background-color: #202020;
+
+.sidebar {
+  background-color: $background-color;
+  width: 17%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &__logo {
+    margin: 2rem auto;
+    display: flex;
+
+    &--icon {
+      width: 9rem;
+      height: 5rem;
+    }
+  }
+
+  &__menu {
+    height: 30rem;
+    font-size: 1.4rem;
+
+    &--headers {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 10px;
+
+      &--title {
+        text-align: left;
+        color: #ffffff;
+        opacity: 0.5;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-left: 7px;
+        text-transform: uppercase;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &--btn {
+        border: 1px solid white;
+        background-color: transparent;
+        height: 1.8rem;
+        cursor: pointer;
+        color: white;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    &--options {
+      width: 84%;
+      padding: 0 8%;
+      background-color: #202020;
+      color: white;
+      height: 2.5rem;
+      text-align: left;
+      cursor: pointer;
+
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        background-color: #505050;
+      }
+
+      &--active {
+        background-color: #505050;
+        font-weight: bold;
+      }
+    }
+  }
+
+  &__btn {
+    font-size: 1.4rem;
+    font-weight: 600;
+    height: 3rem;
+    width: 7rem;
+    background-color: $background-color;
+    border-radius: 3px;
+    margin: 1.5rem auto;
+    cursor: pointer;
+    color: white;
+    border: none;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: #303030;
+    }
+  }
+}
