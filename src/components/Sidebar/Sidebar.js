@@ -5,6 +5,7 @@ import logo from "public/assets/arc_logo_full.svg";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { CircularProgress } from "@mui/material";
 
 export default function Sidebar({ documentIdArray }) {
   const navigate = useNavigate();
@@ -45,7 +46,9 @@ export default function Sidebar({ documentIdArray }) {
         key={key}
         onClick={() => sidebarOnClick(item)}
       >
-        {item.name == null ? `Document ${key + 1}` : null}
+        {item.name == null || item.name === ""
+          ? `Document ${key + 1}`
+          : item.name}
       </div>
     );
   });
@@ -96,7 +99,11 @@ export default function Sidebar({ documentIdArray }) {
             +
           </button>
         </div>
-        {renderSidebarMenu()}
+        {menuOptions.length === 0 ? (
+          <CircularProgress size={40} color="secondary" />
+        ) : (
+          renderSidebarMenu()
+        )}
       </div>
       <button className="sidebar__btn" onClick={logout}>
         Logout

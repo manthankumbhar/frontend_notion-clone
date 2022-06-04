@@ -18,17 +18,18 @@ import "rc-menu/assets/index.css";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { CircularProgress } from "@mui/material";
+import { withHistory } from "slate-history";
 
 export default function SlateEditor({ documentId }) {
   const navigate = useNavigate();
-  const editor = useMemo(() => withReact(createEditor()), []);
+  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     setLoading(true);
     editor.children = JSON.parse(sessionStorage.getItem(documentId)) || [
       {
-        type: "paragraph",
+        type: "heading-one",
         children: [{ text: "" }],
       },
     ];
@@ -56,7 +57,7 @@ export default function SlateEditor({ documentId }) {
         if (parsedData === null) {
           var data = [
             {
-              type: "paragraph",
+              type: "heading-one",
               children: [{ text: "" }],
             },
           ];
@@ -408,6 +409,14 @@ export default function SlateEditor({ documentId }) {
         openMenu();
       }
 
+      if (editor.children[0].type !== "heading-one") {
+        Transforms.setNodes(editor, { type: "heading-one" }, { at: [0] });
+      }
+
+      if (editor.selection.anchor.path[0] === 0) {
+        closeMenu();
+      }
+
       if (event.key === "Enter") {
         event.preventDefault();
         const isList = LIST_TYPES.includes(editor.getFragment()[0].type);
@@ -521,7 +530,7 @@ export default function SlateEditor({ documentId }) {
         }
       }
     },
-    [editor, openMenu, LIST_TYPES, toggleBlock, toggleMark]
+    [editor, openMenu, closeMenu, LIST_TYPES, toggleBlock, toggleMark]
   );
 
   const editorOnChange = useCallback(
@@ -532,6 +541,7 @@ export default function SlateEditor({ documentId }) {
       );
       if (isAstChange) {
         const content = JSON.stringify(newValue);
+        const name = editor.children[0].children[0].text;
         sessionStorage.setItem(documentId, content);
         const config = {
           headers: {
@@ -541,7 +551,7 @@ export default function SlateEditor({ documentId }) {
         };
         axios.post(
           `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
-          { data: content },
+          { data: content, name: name },
           config
         );
       }
@@ -567,7 +577,7 @@ export default function SlateEditor({ documentId }) {
             renderElement={renderElement}
             renderLeaf={renderLeaf}
             onKeyDown={editorOnKeyDown}
-            placeholder={"Type '/' to checkout the magical options."}
+            placeholder={"Document Title!"}
           />
         )}
       </Slate>
