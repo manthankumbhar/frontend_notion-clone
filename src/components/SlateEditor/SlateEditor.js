@@ -20,7 +20,7 @@ import { useNavigate } from "react-router";
 import { CircularProgress } from "@mui/material";
 import { withHistory } from "slate-history";
 
-export default function SlateEditor({ documentId }) {
+export default function SlateEditor({ documentId, updateSidebarArray }) {
   const navigate = useNavigate();
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [content, setContent] = useState([]);
@@ -126,6 +126,7 @@ export default function SlateEditor({ documentId }) {
   ];
   //eslint-disable-next-line
   const [menuOptions, setMenuOptions] = useState(allowedTags);
+  const [documentName, setDocumentName] = useState("");
   const menuFocus = createRef();
 
   useEffect(() => {
@@ -549,14 +550,24 @@ export default function SlateEditor({ documentId }) {
             Authorization: `Bearer ${accessToken}`,
           },
         };
-        axios.post(
-          `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
-          { data: content, name: name },
-          config
-        );
+        if (documentName !== name) {
+          updateSidebarArray(name);
+          setDocumentName(name);
+          axios.post(
+            `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
+            { data: content, name: name },
+            config
+          );
+        } else {
+          axios.post(
+            `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
+            { data: content },
+            config
+          );
+        }
       }
     },
-    [documentId, editor, accessToken]
+    [documentId, editor, accessToken, updateSidebarArray, documentName]
   );
 
   return (
