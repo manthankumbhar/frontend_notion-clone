@@ -47,10 +47,15 @@ $background-color: #202020;
         height: 1.8rem;
         cursor: pointer;
         color: white;
+        transition: all 0.2s;
 
         display: flex;
         align-items: center;
         justify-content: center;
+
+        &:hover {
+          border: 1px solid orangered;
+        }
       }
     }
 

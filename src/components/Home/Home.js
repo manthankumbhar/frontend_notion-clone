@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "components/Home/Home.scss";
 import SlateEditor from "components/SlateEditor/SlateEditor";
 import Sidebar from "components/Sidebar/Sidebar";
@@ -12,6 +12,7 @@ export default function Home() {
   var { id } = useParams();
   const [options, setOptions] = useState([]);
   const [documentId, setdocumentId] = useState("");
+  // const [sidebarUpdate, triggerSidebarUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
   const accessToken = localStorage.accessToken;
   if (accessToken === "" || accessToken === null || accessToken === undefined) {
@@ -70,6 +71,15 @@ export default function Home() {
     documentsArray();
   }, [navigate, id, accessToken]);
 
+  const updateSidebarArray = useCallback(
+    (data) => {
+      var currentDocument = options.find((x) => x.id === documentId);
+      currentDocument.name = data;
+      setOptions([...options]);
+    },
+    [documentId, options]
+  );
+
   return (
     <div className="home">
       <Sidebar documentIdArray={options} />
@@ -78,7 +88,10 @@ export default function Home() {
           <CircularProgress size={40} color="secondary" />
         </div>
       ) : documentId !== "" ? (
-        <SlateEditor documentId={documentId} />
+        <SlateEditor
+          documentId={documentId}
+          updateSidebarArray={(data) => updateSidebarArray(data)}
+        />
       ) : null}
     </div>
   );
