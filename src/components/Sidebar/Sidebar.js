@@ -58,7 +58,6 @@ export default function Sidebar({ documentIdArray }) {
   }, [sidebarMenuOptions]);
 
   const newDocBtnOnClick = useCallback(async () => {
-    console.log("btn clicked");
     try {
       var config = {
         headers: {
