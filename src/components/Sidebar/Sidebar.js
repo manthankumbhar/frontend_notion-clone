@@ -16,6 +16,7 @@ export default function Sidebar({ documentIdArray }) {
       navigate("/");
     });
   }, [navigate]);
+  const [button, setButton] = useState(false);
   const [menuOptions, setMenuOptions] = useState([]);
   const accessToken = localStorage.accessToken;
   if (accessToken === "" || accessToken === null || accessToken === undefined) {
@@ -26,30 +27,23 @@ export default function Sidebar({ documentIdArray }) {
     setMenuOptions(documentIdArray);
   }, [documentIdArray]);
 
-  const sidebarOnClick = useCallback(
-    (item) => {
-      navigate(`/documents/${item.id}`);
-    },
-    [navigate]
-  );
-
   const sidebarMenuOptions = menuOptions.map((item, key) => {
-    var url = document.URL;
-    var documentId = url.substring(url.lastIndexOf("/") + 1);
+    let url = document.URL;
+    let documentId = url.substring(url.lastIndexOf("/") + 1);
     return (
-      <div
+      <Link
         className={
           item.id === documentId
             ? "sidebar__menu--options sidebar__menu--options--active"
             : "sidebar__menu--options"
         }
         key={key}
-        onClick={() => sidebarOnClick(item)}
+        to={`/documents/${item.id}`}
       >
         {item.name == null || item.name === ""
           ? `Document ${key + 1}`
           : item.name}
-      </div>
+      </Link>
     );
   });
 
@@ -58,6 +52,7 @@ export default function Sidebar({ documentIdArray }) {
   }, [sidebarMenuOptions]);
 
   const newDocBtnOnClick = useCallback(async () => {
+    setButton(true);
     try {
       var config = {
         headers: {
@@ -72,10 +67,11 @@ export default function Sidebar({ documentIdArray }) {
       );
       var parsedData = JSON.parse(res.data);
       var id = parsedData["id"];
-      setMenuOptions([...menuOptions, { id: id, name: parsedData["name"] }]);
       navigate(`/documents/${id}`);
-      return res.data;
+      setMenuOptions([...menuOptions, { id: id, name: parsedData["name"] }]);
+      return setButton(false);
     } catch (err) {
+      setButton(false);
       navigate("/error");
     }
   }, [menuOptions, navigate, accessToken]);
@@ -93,7 +89,8 @@ export default function Sidebar({ documentIdArray }) {
           <p className="sidebar__menu--headers--title">Documents:</p>
           <button
             className="sidebar__menu--headers--btn"
-            onClick={newDocBtnOnClick}
+            onClick={button === true ? null : newDocBtnOnClick}
+            style={button === true ? { cursor: "not-allowed" } : null}
           >
             +
           </button>
