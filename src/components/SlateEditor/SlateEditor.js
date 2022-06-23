@@ -19,6 +19,7 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 import { CircularProgress } from "@mui/material";
 import { withHistory } from "slate-history";
+import isHotkey from "is-hotkey";
 
 export default function SlateEditor({ documentId, updateSidebarArray }) {
   const navigate = useNavigate();
@@ -353,6 +354,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
 
       if (event.key === "Enter") {
         event.preventDefault();
+        editor.deleteBackward();
       }
     },
     [closeMenu, editor]
@@ -370,7 +372,6 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   const markdownListMenuOptions = menuOptions.map((item, key) => {
     return (
       <MenuItem
-        tabIndex="0"
         className="editor__menu--item"
         key={key}
         onClick={() => onClickMenu(item)}
@@ -407,6 +408,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   const editorOnKeyDown = useCallback(
     (event) => {
       if (event.key === "/") {
+        editor.insertText("/");
         openMenu();
       }
 
@@ -414,7 +416,8 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
         Transforms.setNodes(editor, { type: "heading-one" }, { at: [0] });
       }
 
-      if (editor.selection.anchor.path[0] === 0) {
+      if (editor.selection.anchor.path[0] === 0 && event.key === "/") {
+        editor.deleteBackward();
         closeMenu();
       }
 
@@ -491,44 +494,24 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
         }
       }
 
-      if (!event.ctrlKey) {
-        return;
+      const keyboardShortucts = {
+        "mod+b": "bold",
+        "mod+i": "italic",
+        "mod+u": "underline",
+        "mod+s": "strikeThrough",
+        "mod+e": "code",
+      };
+
+      for (const hotkey in keyboardShortucts) {
+        if (isHotkey(hotkey, event)) {
+          event.preventDefault();
+          const mark = keyboardShortucts[hotkey];
+          toggleMark(editor, mark);
+        }
       }
 
-      switch (event.key) {
-        case "e": {
-          event.preventDefault();
-          toggleMark(editor, "code");
-          break;
-        }
-
-        case "b": {
-          event.preventDefault();
-          toggleMark(editor, "bold");
-          break;
-        }
-
-        case "i": {
-          event.preventDefault();
-          toggleMark(editor, "italic");
-          break;
-        }
-
-        case "u": {
-          event.preventDefault();
-          toggleMark(editor, "underline");
-          break;
-        }
-
-        case "s": {
-          event.preventDefault();
-          toggleMark(editor, "strikeThrough");
-          break;
-        }
-
-        default: {
-          return null;
-        }
+      if (event.key === "c" && event.ctrlKey) {
+        console.log("COPYING");
       }
     },
     [editor, openMenu, closeMenu, LIST_TYPES, toggleBlock, toggleMark]
