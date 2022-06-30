@@ -222,7 +222,7 @@ export default function PublicDocument() {
                 }}
               />
               <a
-                href="/"
+                href="/signup"
                 target="_blank"
                 style={{
                   width: "10rem",
@@ -238,7 +238,7 @@ export default function PublicDocument() {
             </div>
             <Editable
               className="editor__area"
-              style={{ padding: "3rem 8rem", marginTop: "-5px" }}
+              style={{ padding: "3rem 3rem 3rem 10rem", marginTop: "-5px" }}
               renderElement={renderElement}
               renderLeaf={renderLeaf}
               readOnly={true}
