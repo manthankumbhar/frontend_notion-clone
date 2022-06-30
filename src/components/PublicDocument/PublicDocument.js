@@ -17,7 +17,6 @@ import logo from "public/assets/arc_logo_full.svg";
 export default function PublicDocument() {
   const { id } = useParams();
   const documentId = id;
-  console.log(documentId);
   const navigate = useNavigate();
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [content, setContent] = useState([]);
