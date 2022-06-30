@@ -332,7 +332,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
 
   const closeMenu = useCallback(() => {
     setShowMenu(false);
-  }, [setShowMenu]);
+  }, []);
 
   const openMenu = useCallback(() => {
     const position = getCoordinates();
@@ -446,7 +446,6 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
               editor.selection.anchor.path[1]
             ].text.length;
           const listType = editor.getFragment()[0].type;
-          console.log(listType);
           if (listLength === 0) {
             event.preventDefault();
             toggleBlock(editor, listType);
