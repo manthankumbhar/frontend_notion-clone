@@ -332,7 +332,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
 
   const closeMenu = useCallback(() => {
     setShowMenu(false);
-  }, [setShowMenu]);
+  }, []);
 
   const openMenu = useCallback(() => {
     const position = getCoordinates();
