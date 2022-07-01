@@ -10,7 +10,8 @@ import { CircularProgress } from "@mui/material";
 export default function Home() {
   const navigate = useNavigate();
   var { id } = useParams();
-  const [options, setOptions] = useState([]);
+  const [documentsArray, setDocumentsArray] = useState([]);
+  const [sharedDocumentsArray, setSharedDocumentsArray] = useState([]);
   const [documentId, setdocumentId] = useState("");
   // const [sidebarUpdate, triggerSidebarUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -51,16 +52,25 @@ export default function Home() {
           navigate(`/documents/${id_2}`);
           return res_2.data;
         }
-        setOptions(res.data);
-        var arr = [];
-        await res.data.map((x) => arr.push(x["id"]));
-        if (arr.includes(id)) {
+        setDocumentsArray(res.data["documents"]);
+        setSharedDocumentsArray(res.data["shared_documents"]);
+        let documents = [];
+        let shared_documents = [];
+        await res.data["documents"].map((x) => documents.push(x["id"]));
+        await res.data["shared_documents"].map((x) =>
+          shared_documents.push(x["id"])
+        );
+        if (documents.includes(id)) {
+          setdocumentId(id);
+          navigate(`/documents/${id}`);
+          setLoading(false);
+        } else if (shared_documents.includes(id)) {
           setdocumentId(id);
           navigate(`/documents/${id}`);
           setLoading(false);
         } else {
-          setdocumentId(res.data[0]["id"]);
-          navigate(`/documents/${res.data[0]["id"]}`);
+          setdocumentId(documents[0]);
+          navigate(`/documents/${documents[0]}`);
           setLoading(false);
         }
       } catch (err) {
@@ -73,16 +83,27 @@ export default function Home() {
 
   const updateSidebarArray = useCallback(
     (data) => {
-      var currentDocument = options.find((x) => x.id === documentId);
-      currentDocument.name = data;
-      setOptions([...options]);
+      var currentDocument = documentsArray.find((x) => x.id === documentId);
+      var currrentSharedDocument = sharedDocumentsArray.find(
+        (x) => x.id === documentId
+      );
+      if (currentDocument) {
+        currentDocument.name = data;
+        setDocumentsArray([...documentsArray]);
+      } else {
+        currrentSharedDocument.name = data;
+        setSharedDocumentsArray([...sharedDocumentsArray]);
+      }
     },
-    [documentId, options]
+    [documentId, documentsArray, sharedDocumentsArray]
   );
 
   return (
     <div className="home">
-      <Sidebar documentIdArray={options} />
+      <Sidebar
+        documentsArray={documentsArray}
+        sharedDocumentsArray={sharedDocumentsArray}
+      />
       {loading ? (
         <div className="home__loading">
           <CircularProgress size={40} color="secondary" />
