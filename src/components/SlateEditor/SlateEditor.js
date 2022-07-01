@@ -17,9 +17,10 @@ import Menu, { Item as MenuItem } from "rc-menu";
 import "rc-menu/assets/index.css";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, FormControlLabel, Switch } from "@mui/material";
 import { withHistory } from "slate-history";
 import isHotkey from "is-hotkey";
+import SnackBar from "components/SnackBar/SnackBar";
 
 export default function SlateEditor({ documentId, updateSidebarArray }) {
   const navigate = useNavigate();
@@ -128,7 +129,14 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   //eslint-disable-next-line
   const [menuOptions, setMenuOptions] = useState(allowedTags);
   const [documentName, setDocumentName] = useState("");
+  const [sharingMenu, setSharingMenu] = useState(false);
+  const [publicSharing, setPublicSharing] = useState(false);
+  const [sharedEmailFromUser, setSharedEmailFromUser] = useState("");
   const menuFocus = createRef();
+
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setsnackbarSeverity] = useState("error");
 
   useEffect(() => {
     menuFocus.current?.focus();
@@ -248,6 +256,19 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
 
     if (leaf.strikeThrough) {
       children = <del>{children}</del>;
+    }
+
+    if (leaf.hyperLink) {
+      children = (
+        <a
+          style={{ color: "blue" }}
+          href={children}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {children}
+        </a>
+      );
     }
 
     return <span {...attributes}>{children}</span>;
@@ -499,6 +520,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
         "mod+u": "underline",
         "mod+s": "strikeThrough",
         "mod+e": "code",
+        "mod+a": "hyperLink",
       };
 
       for (const hotkey in keyboardShortucts) {
@@ -552,26 +574,186 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
     [documentId, editor, accessToken, updateSidebarArray, documentName]
   );
 
+  const closeSharingMenu = useCallback(() => {
+    setSharingMenu(false);
+  }, []);
+
+  const submitSharingRequest = useCallback(
+    async (e) => {
+      try {
+        e.preventDefault();
+        var config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+        var res = await axios.post(
+          `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}/share`,
+          {
+            email: sharedEmailFromUser,
+          },
+          config
+        );
+        if (res.status === 200) {
+          setOpenSnackbar(true);
+          setsnackbarSeverity("success");
+          setSnackbarMessage("Document shared.");
+        }
+      } catch (error) {
+        setOpenSnackbar(true);
+        setsnackbarSeverity("error");
+        setSnackbarMessage("Couldn't share, please try again");
+      }
+    },
+    [accessToken, documentId, sharedEmailFromUser]
+  );
+
+  const handleSwitchChange = useCallback(
+    async (e) => {
+      try {
+        setPublicSharing(e.target.checked);
+        var config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+        var res = await axios.post(
+          `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}/share`,
+          {
+            email: localStorage.getItem("ownerEmail"),
+            public: publicSharing,
+          },
+          config
+        );
+        if (res.status === 200) {
+          setOpenSnackbar(true);
+          setsnackbarSeverity("success");
+          setSnackbarMessage("Document sharing changed.");
+        }
+      } catch (error) {
+        setOpenSnackbar(true);
+        setsnackbarSeverity("error");
+        setSnackbarMessage("Couldn't share, please try again");
+      }
+    },
+    [accessToken, documentId, publicSharing]
+  );
+
+  const handleSharedUserChange = useCallback((e) => {
+    setSharedEmailFromUser(e.target.value);
+  }, []);
+
+  const SharingMenu = useCallback(() => {
+    return (
+      <div className="editor__share--menu">
+        <form onSubmit={(e) => submitSharingRequest(e)}>
+          <button
+            className="editor__share--menu-closeBtn"
+            onClick={() => closeSharingMenu()}
+          >
+            X
+          </button>
+          <div>
+            <input
+              className="editor__share--menu-input"
+              type="text"
+              placeholder="Email to share the document with..."
+              value={sharedEmailFromUser}
+              onChange={(e) => handleSharedUserChange(e)}
+            />
+            <button className="editor__share--menu-btn" type="submit">
+              ADD
+            </button>
+          </div>
+        </form>
+        <FormControlLabel
+          label="Public:"
+          labelPlacement="start"
+          control={
+            <Switch
+              checked={publicSharing}
+              onChange={(e) => handleSwitchChange(e)}
+            />
+          }
+        />
+        {publicSharing ? (
+          <div>
+            <input
+              readOnly
+              className="editor__share--menu-input"
+              value={`https://open-source-notion.manthankumbhar.com/shared/${documentId}`}
+            />
+            <button
+              className="editor__share--menu-btn"
+              onClick={() =>
+                navigator.clipboard.writeText(
+                  `open-source-notion.manthankumbhar.com/shared/${documentId}`
+                )
+              }
+            >
+              Copy
+            </button>
+          </div>
+        ) : null}
+      </div>
+    );
+  }, [
+    closeSharingMenu,
+    submitSharingRequest,
+    documentId,
+    publicSharing,
+    handleSwitchChange,
+    handleSharedUserChange,
+    sharedEmailFromUser,
+  ]);
+
+  const RenderSharingMenu = useCallback(() => {
+    return sharingMenu ? SharingMenu() : null;
+  }, [SharingMenu, sharingMenu]);
+
+  const shareBtnOnClick = useCallback(() => {
+    setSharingMenu(true);
+  }, []);
+
   return (
     <div className="editor">
+      <SnackBar
+        setOpenSnackBar={setOpenSnackbar}
+        openSnackBar={openSnackbar}
+        snackBarSeverity={snackbarSeverity}
+        snackBarMessage={snackbarMessage}
+      />
       <Slate
         editor={editor}
         value={content}
         onChange={(newValue) => editorOnChange(newValue)}
       >
         <RenderMarkdownListMenu />
+        {RenderSharingMenu()}
         {loading ? (
           <div className="editor__loading">
             <CircularProgress size={40} color="secondary" />
           </div>
         ) : (
-          <Editable
-            className="editor__area"
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            onKeyDown={editorOnKeyDown}
-            placeholder={"Document Title!"}
-          />
+          <div>
+            <div className="editor__share">
+              <button
+                className="editor__share--btn"
+                onClick={() => shareBtnOnClick()}
+              >
+                Share
+              </button>
+            </div>
+            <Editable
+              className="editor__area"
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              onKeyDown={editorOnKeyDown}
+              placeholder={"Document Title!"}
+            />
+          </div>
         )}
       </Slate>
     </div>

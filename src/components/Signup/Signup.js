@@ -45,6 +45,7 @@ export default function Signup() {
           auth.login(() => {
             localStorage.setItem("accessToken", res.data["access_token"]);
             localStorage.setItem("refreshToken", res.data["refresh_token"]);
+            localStorage.setItem("ownerEmail", email);
             setLoading(false);
             navigate("/home");
           });

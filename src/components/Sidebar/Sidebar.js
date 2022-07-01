@@ -13,6 +13,7 @@ export default function Sidebar({ documentIdArray }) {
     auth.logout(() => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("ownerEmail");
       navigate("/");
     });
   }, [navigate]);
