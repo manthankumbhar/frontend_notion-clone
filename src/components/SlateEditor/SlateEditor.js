@@ -260,12 +260,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
 
     if (leaf.hyperLink) {
       children = (
-        <a
-          style={{ color: "blue" }}
-          href={children}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a href={children.props.leaf.text} target="_blank" rel="noreferrer">
           {children}
         </a>
       );
