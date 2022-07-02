@@ -6,8 +6,8 @@ import React, {
   useState,
 } from "react";
 import "components/SlateEditor/SlateEditor.scss";
-import { createEditor, Transforms } from "slate";
-import { Slate, Editable, withReact, ReactEditor } from "slate-react";
+import { createEditor } from "slate";
+import { Slate, Editable, withReact } from "slate-react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router";
 import { CircularProgress } from "@mui/material";
@@ -106,36 +106,19 @@ export default function PublicDocument() {
     </li>
   );
 
-  const onChangeChecklist = useCallback(
-    (e, props) => {
-      const path = ReactEditor.findPath(editor, props.element);
-      const newProperties = {
-        checked: e.target.checked,
-      };
-      Transforms.setNodes(editor, newProperties, { at: path });
-    },
-    [editor]
-  );
-
-  const checkListElement = useCallback(
-    (props) => {
-      return (
-        <span className="editor__styles--checklist">
-          <input
-            {...props.attributes}
-            type="checkbox"
-            className="editor__styles--checklist-input"
-            checked={props.children[0].props.parent.checked}
-            onChange={(e) => {
-              onChangeChecklist(e, props);
-            }}
-          />
-          {props.children}
-        </span>
-      );
-    },
-    [onChangeChecklist]
-  );
+  const checkListElement = useCallback((props) => {
+    return (
+      <span className="editor__styles--checklist">
+        <input
+          {...props.attributes}
+          type="checkbox"
+          className="editor__styles--checklist-input"
+          checked={props.children[0].props.parent.checked}
+        />
+        {props.children}
+      </span>
+    );
+  }, []);
 
   const blockQuoteElement = (props) => (
     <blockquote {...props.attributes} className="editor__styles--quote">
@@ -190,6 +173,22 @@ export default function PublicDocument() {
 
     if (leaf.strikeThrough) {
       children = <del>{children}</del>;
+    }
+
+    if (leaf.hyperLink) {
+      children = (
+        <a
+          href={
+            children.props.leaf.text.includes("http")
+              ? `${children.props.leaf.text}`
+              : `//${children.props.leaf.text}`
+          }
+          target="_blank"
+          rel="noreferrer"
+        >
+          {children}
+        </a>
+      );
     }
 
     return <span {...attributes}>{children}</span>;

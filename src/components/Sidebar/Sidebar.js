@@ -7,55 +7,75 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { CircularProgress } from "@mui/material";
 
-export default function Sidebar({ documentIdArray }) {
+export default function Sidebar({ documentsArray, sharedDocumentsArray }) {
   const navigate = useNavigate();
   const logout = useCallback(() => {
     auth.logout(() => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("ownerEmail");
       navigate("/");
     });
   }, [navigate]);
-  const [menuOptions, setMenuOptions] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [sharedDocuments, setSharedDocuments] = useState([]);
   const accessToken = localStorage.accessToken;
   if (accessToken === "" || accessToken === null || accessToken === undefined) {
     navigate("/error");
   }
 
   useEffect(() => {
-    setMenuOptions(documentIdArray);
-  }, [documentIdArray]);
+    setDocuments(documentsArray);
+    setSharedDocuments(sharedDocumentsArray);
+  }, [documentsArray, sharedDocumentsArray]);
 
-  const sidebarOnClick = useCallback(
-    (item) => {
-      navigate(`/documents/${item.id}`);
-    },
-    [navigate]
-  );
-
-  const sidebarMenuOptions = menuOptions.map((item, key) => {
+  const documentOptions = documents.map((item, key) => {
     var url = document.URL;
     var documentId = url.substring(url.lastIndexOf("/") + 1);
     return (
-      <div
+      <Link
         className={
           item.id === documentId
             ? "sidebar__menu--options sidebar__menu--options--active"
             : "sidebar__menu--options"
         }
         key={key}
-        onClick={() => sidebarOnClick(item)}
+        to={`/documents/${item.id}`}
       >
         {item.name == null || item.name === ""
           ? `Document ${key + 1}`
           : item.name}
-      </div>
+      </Link>
     );
   });
 
-  const renderSidebarMenu = useCallback(() => {
-    return <div>{sidebarMenuOptions}</div>;
-  }, [sidebarMenuOptions]);
+  const sharedDocumentOptions = sharedDocuments.map((item, key) => {
+    var url = document.URL;
+    var documentId = url.substring(url.lastIndexOf("/") + 1);
+    return (
+      <Link
+        className={
+          item.id === documentId
+            ? "sidebar__menu--options sidebar__menu--options--active"
+            : "sidebar__menu--options"
+        }
+        key={key}
+        to={`/documents/${item.id}`}
+      >
+        {item.name == null || item.name === ""
+          ? `Shared Document ${key + 1}`
+          : item.name}
+      </Link>
+    );
+  });
+
+  const renderDocuments = useCallback(() => {
+    return <div>{documentOptions}</div>;
+  }, [documentOptions]);
+
+  const renderSharedDocuments = useCallback(() => {
+    return <div>{sharedDocumentOptions}</div>;
+  }, [sharedDocumentOptions]);
 
   const newDocBtnOnClick = useCallback(async () => {
     try {
@@ -72,13 +92,13 @@ export default function Sidebar({ documentIdArray }) {
       );
       var parsedData = JSON.parse(res.data);
       var id = parsedData["id"];
-      setMenuOptions([...menuOptions, { id: id, name: parsedData["name"] }]);
+      setDocuments([...documents, { id: id, name: parsedData["name"] }]);
       navigate(`/documents/${id}`);
       return res.data;
     } catch (err) {
       navigate("/error");
     }
-  }, [menuOptions, navigate, accessToken]);
+  }, [documents, navigate, accessToken]);
 
   return (
     <div className="sidebar">
@@ -87,8 +107,24 @@ export default function Sidebar({ documentIdArray }) {
       </Link>
       <div
         className="sidebar__menu"
-        style={menuOptions.length > 10 ? { overflowY: "scroll" } : null}
+        style={
+          documents.length + sharedDocuments.length > 10
+            ? { overflowY: "scroll" }
+            : null
+        }
       >
+        {sharedDocumentsArray.length !== 0 ? (
+          <>
+            <div className="sidebar__menu--headers">
+              <p className="sidebar__menu--headers--title">Shared Documents:</p>
+            </div>
+            {sharedDocuments.length === 0 ? (
+              <CircularProgress size={40} color="secondary" />
+            ) : (
+              renderSharedDocuments()
+            )}
+          </>
+        ) : null}
         <div className="sidebar__menu--headers">
           <p className="sidebar__menu--headers--title">Documents:</p>
           <button
@@ -98,10 +134,10 @@ export default function Sidebar({ documentIdArray }) {
             +
           </button>
         </div>
-        {menuOptions.length === 0 ? (
+        {documents.length === 0 ? (
           <CircularProgress size={40} color="secondary" />
         ) : (
-          renderSidebarMenu()
+          renderDocuments()
         )}
       </div>
       <button className="sidebar__btn" onClick={logout}>
