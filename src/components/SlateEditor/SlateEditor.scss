@@ -14,11 +14,6 @@ $background-color: #191919;
     line-height: 1;
   }
 
-  input[type="checkbox"]:checked + span {
-    color: grey;
-    text-decoration: line-through;
-  }
-
   &__styles {
     &--quote {
       border-left: 2px solid grey;
@@ -43,6 +38,11 @@ $background-color: #191919;
       &-input {
         margin-right: 1rem;
         cursor: pointer;
+
+        &:checked + span {
+          color: grey;
+          text-decoration: line-through;
+        }
       }
     }
 

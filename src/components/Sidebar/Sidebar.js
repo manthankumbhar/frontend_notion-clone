@@ -29,30 +29,23 @@ export default function Sidebar({ documentsArray, sharedDocumentsArray }) {
     setSharedDocuments(sharedDocumentsArray);
   }, [documentsArray, sharedDocumentsArray]);
 
-  const sidebarOnClick = useCallback(
-    (item) => {
-      navigate(`/documents/${item.id}`);
-    },
-    [navigate]
-  );
-
   const documentOptions = documents.map((item, key) => {
     var url = document.URL;
     var documentId = url.substring(url.lastIndexOf("/") + 1);
     return (
-      <div
+      <Link
         className={
           item.id === documentId
             ? "sidebar__menu--options sidebar__menu--options--active"
             : "sidebar__menu--options"
         }
         key={key}
-        onClick={() => sidebarOnClick(item)}
+        to={`/documents/${item.id}`}
       >
         {item.name == null || item.name === ""
           ? `Document ${key + 1}`
           : item.name}
-      </div>
+      </Link>
     );
   });
 
@@ -60,19 +53,19 @@ export default function Sidebar({ documentsArray, sharedDocumentsArray }) {
     var url = document.URL;
     var documentId = url.substring(url.lastIndexOf("/") + 1);
     return (
-      <div
+      <Link
         className={
           item.id === documentId
             ? "sidebar__menu--options sidebar__menu--options--active"
             : "sidebar__menu--options"
         }
         key={key}
-        onClick={() => sidebarOnClick(item)}
+        to={`/documents/${item.id}`}
       >
         {item.name == null || item.name === ""
-          ? `Document ${key + 1}`
+          ? `Shared Document ${key + 1}`
           : item.name}
-      </div>
+      </Link>
     );
   });
 

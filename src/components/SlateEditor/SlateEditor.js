@@ -260,7 +260,11 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
 
     if (leaf.hyperLink) {
       children = (
-        <a href={children.props.leaf.text} target="_blank" rel="noreferrer">
+        <a
+          href={`//${children.props.leaf.text}`}
+          target="_blank"
+          rel="noreferrer"
+        >
           {children}
         </a>
       );
@@ -596,9 +600,17 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
           setSnackbarMessage("Document shared.");
         }
       } catch (error) {
-        setOpenSnackbar(true);
-        setsnackbarSeverity("error");
-        setSnackbarMessage("Couldn't share, please try again");
+        if (error.response.status === 403) {
+          setOpenSnackbar(true);
+          setsnackbarSeverity("error");
+          setSnackbarMessage(
+            "You're not the owner of this document, so can't share it."
+          );
+        } else {
+          setOpenSnackbar(true);
+          setsnackbarSeverity("error");
+          setSnackbarMessage("Couldn't share, please try again");
+        }
       }
     },
     [accessToken, documentId, sharedEmailFromUser]
@@ -607,7 +619,8 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   const handleSwitchChange = useCallback(
     async (e) => {
       try {
-        setPublicSharing(e.target.checked);
+        let target = e.target.checked;
+        console.log(target);
         var config = {
           headers: {
             "Content-Type": "application/json",
@@ -618,22 +631,31 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
           `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}/share`,
           {
             email: localStorage.getItem("ownerEmail"),
-            public: publicSharing,
+            public: target,
           },
           config
         );
         if (res.status === 200) {
+          setPublicSharing(target);
           setOpenSnackbar(true);
           setsnackbarSeverity("success");
           setSnackbarMessage("Document sharing changed.");
         }
       } catch (error) {
-        setOpenSnackbar(true);
-        setsnackbarSeverity("error");
-        setSnackbarMessage("Couldn't share, please try again");
+        if (error.response.status === 403) {
+          setOpenSnackbar(true);
+          setsnackbarSeverity("error");
+          setSnackbarMessage(
+            "You're not the owner of this document, so can't share it."
+          );
+        } else {
+          setOpenSnackbar(true);
+          setsnackbarSeverity("error");
+          setSnackbarMessage("Couldn't share, please try again");
+        }
       }
     },
-    [accessToken, documentId, publicSharing]
+    [accessToken, documentId]
   );
 
   const handleSharedUserChange = useCallback((e) => {

@@ -13,7 +13,6 @@ export default function Home() {
   const [documentsArray, setDocumentsArray] = useState([]);
   const [sharedDocumentsArray, setSharedDocumentsArray] = useState([]);
   const [documentId, setdocumentId] = useState("");
-  // const [sidebarUpdate, triggerSidebarUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
   const accessToken = localStorage.accessToken;
   if (accessToken === "" || accessToken === null || accessToken === undefined) {

@@ -177,7 +177,11 @@ export default function PublicDocument() {
 
     if (leaf.hyperLink) {
       children = (
-        <a href={children.props.leaf.text} target="_blank" rel="noreferrer">
+        <a
+          href={`//${children.props.leaf.text}`}
+          target="_blank"
+          rel="noreferrer"
+        >
           {children}
         </a>
       );
