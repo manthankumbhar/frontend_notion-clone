@@ -261,7 +261,11 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
     if (leaf.hyperLink) {
       children = (
         <a
-          href={`//${children.props.leaf.text}`}
+          href={
+            children.props.leaf.text.includes("http")
+              ? `${children.props.leaf.text}`
+              : `//${children.props.leaf.text}`
+          }
           target="_blank"
           rel="noreferrer"
         >
