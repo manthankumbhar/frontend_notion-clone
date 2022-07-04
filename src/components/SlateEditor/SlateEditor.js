@@ -378,7 +378,6 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
 
       if (event.key === "Enter") {
         event.preventDefault();
-        editor.deleteBackward();
       }
     },
     [closeMenu, editor]
@@ -387,6 +386,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   var onClickMenu = useCallback(
     (item) => {
       toggleBlock(editor, item.value);
+      editor.deleteBackward();
       closeMenu();
       ReactEditor.focus(editor);
     },
