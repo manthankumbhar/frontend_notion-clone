@@ -34,7 +34,7 @@ export default function Home() {
           `${process.env.REACT_APP_SERVER_LINK}/documents?user_id=${userId}`,
           config
         );
-        if (res.data.length === 0) {
+        if (res.data["documents"].length === 0) {
           var config_2 = {
             headers: {
               "Content-Type": "application/json",
