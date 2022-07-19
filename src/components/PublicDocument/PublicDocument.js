@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import "components/SlateEditor/SlateEditor.scss";
+import "components/PublicDocument/PublicDocument.scss";
 import { createEditor } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
 import axios from "axios";
@@ -89,30 +89,30 @@ export default function PublicDocument() {
   );
 
   const numberedListElement = (props) => (
-    <ol {...props.attributes} className="editor__styles--numbered">
+    <ol {...props.attributes} className="publicDocument__styles--numbered">
       {props.children}
     </ol>
   );
 
   const bulletedListElement = (props) => (
-    <ul {...props.attributes} className="editor__styles--bulleted">
+    <ul {...props.attributes} className="publicDocument__styles--bulleted">
       {props.children}
     </ul>
   );
 
   const listItemElement = (props) => (
-    <li {...props.attributes} className="editor__styles--bulleted">
+    <li {...props.attributes} className="publicDocument__styles--bulleted">
       {props.children}
     </li>
   );
 
   const checkListElement = useCallback((props) => {
     return (
-      <span className="editor__styles--checklist">
+      <span className="publicDocument__styles--checklist">
         <input
           {...props.attributes}
           type="checkbox"
-          className="editor__styles--checklist-input"
+          className="publicDocument__styles--checklist-input"
           checked={props.children[0].props.parent.checked}
         />
         {props.children}
@@ -121,7 +121,7 @@ export default function PublicDocument() {
   }, []);
 
   const blockQuoteElement = (props) => (
-    <blockquote {...props.attributes} className="editor__styles--quote">
+    <blockquote {...props.attributes} className="publicDocument__styles--quote">
       {props.children}
     </blockquote>
   );
@@ -160,7 +160,9 @@ export default function PublicDocument() {
     }
 
     if (leaf.code) {
-      children = <code className="editor__styles--code">{children}</code>;
+      children = (
+        <code className="publicDocument__styles--code">{children}</code>
+      );
     }
 
     if (leaf.italic) {
@@ -185,6 +187,7 @@ export default function PublicDocument() {
           }
           target="_blank"
           rel="noreferrer"
+          className="publicDocument__styles--hyperlink"
         >
           {children}
         </a>
@@ -198,12 +201,13 @@ export default function PublicDocument() {
     <div>
       <Slate editor={editor} value={content}>
         {loading ? (
-          <div className="editor__loading">
+          <div className="publicDocument__loading">
             <CircularProgress size={40} color="secondary" />
           </div>
         ) : (
           <>
             <div
+              className="publicDocument__container"
               style={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -213,30 +217,18 @@ export default function PublicDocument() {
               <img
                 src={logo}
                 alt="logo"
-                className="sidebar__logo--icon"
-                style={{
-                  backgroundColor: "#191919",
-                  padding: "2rem 3rem",
-                }}
+                className="publicDocument__container--icon"
               />
               <a
                 href="/signup"
                 target="_blank"
-                style={{
-                  width: "10rem",
-                  height: "3rem",
-                  margin: "2rem 3rem",
-                  textDecoration: "none",
-                  paddingTop: "1rem",
-                }}
-                className="sidebar__btn"
+                className="publicDocument__container--btn"
               >
                 Try Arc Free
               </a>
             </div>
             <Editable
-              className="editor__area"
-              style={{ padding: "3rem 3rem 3rem 10rem", marginTop: "-5px" }}
+              className="publicDocument__area"
               renderElement={renderElement}
               renderLeaf={renderLeaf}
               readOnly={true}

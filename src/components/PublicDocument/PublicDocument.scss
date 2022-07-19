@@ -1,0 +1,101 @@
+$background-color: #191919;
+
+.publicDocument {
+  flex: 1;
+  overflow: hidden scroll;
+
+  &__container {
+    &--icon {
+      width: 9rem;
+      height: 5rem;
+      padding: 2rem 3rem;
+      background-color: $background-color;
+    }
+
+    &--btn {
+      font-size: 1.4rem;
+      font-weight: 600;
+      height: 3rem;
+      width: 10rem;
+      background-color: $background-color;
+      border-radius: 3px;
+      margin: 2rem 3rem;
+      cursor: pointer;
+      color: white;
+      text-decoration: none;
+      border: none;
+      padding-top: 1rem;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: #303030;
+      }
+    }
+  }
+
+  &__area {
+    padding: 3rem 3rem 3rem 10rem;
+    margin-top: -5px;
+    font-size: 1.7rem;
+    text-align: left;
+    background-color: $background-color;
+    color: #f2f2f2;
+    min-height: 100vh !important;
+    line-height: 1;
+  }
+
+  &__styles {
+    &--quote {
+      border-left: 2px solid grey;
+      color: grey;
+      padding-left: 1rem;
+      margin-left: 0;
+    }
+
+    &--numbered {
+      margin: 8px 0px 8px -5px;
+    }
+
+    &--bulleted {
+      margin: 8px 0px 8px -5px;
+    }
+
+    &--checklist {
+      display: flex;
+      align-items: center;
+      margin: 8px 5px;
+
+      &-input {
+        margin-right: 1rem;
+        cursor: pointer;
+
+        &:checked + span {
+          color: grey;
+          text-decoration: line-through;
+        }
+      }
+    }
+
+    &--code {
+      background-color: #87837826;
+      color: #eb5757;
+      padding: 5px;
+      border-radius: 4px;
+      font-size: 1.4rem;
+    }
+
+    &--hyperlink {
+      color: blue;
+    }
+  }
+
+  &__loading {
+    min-height: 100vh;
+    background-color: $background-color;
+
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+  }
+}

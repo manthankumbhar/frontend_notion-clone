@@ -445,7 +445,12 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
         closeMenu();
       }
 
-      if (event.key === "Enter") {
+      if (event.key === "Enter" && event.shiftKey === true) {
+        event.preventDefault();
+        editor.insertText("\n");
+      }
+
+      if (event.key === "Enter" && event.shiftKey === false) {
         event.preventDefault();
         const isList = LIST_TYPES.includes(editor.getFragment()[0].type);
         const isChecklist = editor.getFragment()[0].type === "check-list";
@@ -523,7 +528,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
         "mod+u": "underline",
         "mod+s": "strikeThrough",
         "mod+e": "code",
-        "mod+a": "hyperLink",
+        "mod+l": "hyperLink",
       };
 
       for (const hotkey in keyboardShortucts) {

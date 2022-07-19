@@ -61,6 +61,7 @@ $background-color: #202020;
 
     &--container {
       background-color: #202020;
+      overflow-x: hidden;
 
       &:hover {
         background-color: #505050;
