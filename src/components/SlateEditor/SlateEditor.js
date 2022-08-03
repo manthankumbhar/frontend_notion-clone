@@ -43,10 +43,10 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   }
 
   useEffect(() => {
-    var getData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        var res = await axios.get(
+        let res = await axios.get(
           `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
           {
             headers: {
@@ -55,9 +55,9 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
             },
           }
         );
-        var parsedData = JSON.parse(res.data)["data"];
+        let parsedData = JSON.parse(res.data)["data"];
         if (parsedData === null) {
-          var data = [
+          let data = [
             {
               type: "heading-one",
               children: [{ text: "" }],
@@ -78,8 +78,8 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
         navigate("/error");
       }
     };
-    getData();
-  }, [navigate, documentId, editor, accessToken]);
+    fetchData();
+  }, [accessToken, documentId, navigate]);
 
   const LIST_TYPES = useMemo(() => ["numbered-list", "bulleted-list"], []);
   const [showMenu, setShowMenu] = useState(false);
@@ -132,15 +132,15 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   const [sharingMenu, setSharingMenu] = useState(false);
   const [publicSharing, setPublicSharing] = useState(false);
   const [sharedEmailFromUser, setSharedEmailFromUser] = useState("");
-  const menuFocus = createRef();
+  const menuRef = createRef();
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setsnackbarSeverity] = useState("error");
 
   useEffect(() => {
-    menuFocus.current?.focus();
-  }, [menuFocus]);
+    menuRef.current?.focus();
+  }, [menuRef]);
 
   const headingOneElement = (props) => (
     <h1 {...props.attributes}>{props.children}</h1>
@@ -411,13 +411,13 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
       <Menu
         className="editor__menu"
         style={coordinates}
-        ref={menuFocus}
+        ref={menuRef}
         onKeyDown={menuOnKeyDown}
       >
         {markdownListMenuOptions}
       </Menu>
     );
-  }, [markdownListMenuOptions, coordinates, menuFocus, menuOnKeyDown]);
+  }, [markdownListMenuOptions, coordinates, menuRef, menuOnKeyDown]);
 
   const RenderMarkdownListMenu = useCallback(() => {
     return showMenu ? showMenu && <MarkdownListMenu /> : null;
