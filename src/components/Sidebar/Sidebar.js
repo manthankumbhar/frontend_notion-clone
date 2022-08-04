@@ -58,8 +58,8 @@ export default function Sidebar({ documentsArray, sharedDocumentsArray }) {
   );
 
   const documentOptions = documents.map((item, key) => {
-    var url = document.URL;
-    var documentId = url.substring(url.lastIndexOf("/") + 1);
+    let url = document.URL;
+    let documentId = url.substring(url.lastIndexOf("/") + 1);
     return (
       <div className="sidebar__menu--container" key={key}>
         <Link
@@ -87,8 +87,8 @@ export default function Sidebar({ documentsArray, sharedDocumentsArray }) {
   });
 
   const sharedDocumentOptions = sharedDocuments.map((item, key) => {
-    var url = document.URL;
-    var documentId = url.substring(url.lastIndexOf("/") + 1);
+    let url = document.URL;
+    let documentId = url.substring(url.lastIndexOf("/") + 1);
     return (
       <div className="sidebar__menu--container" key={key}>
         <Link
@@ -118,19 +118,20 @@ export default function Sidebar({ documentsArray, sharedDocumentsArray }) {
 
   const newDocBtnOnClick = useCallback(async () => {
     try {
-      var config = {
+      let config = {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
       };
-      var res = await axios.post(
+      let res = await axios.post(
         `${process.env.REACT_APP_SERVER_LINK}/documents`,
         {},
         config
       );
-      var parsedData = JSON.parse(res.data);
-      var id = parsedData["id"];
+
+      let parsedData = JSON.parse(res.data);
+      let id = parsedData["id"];
       setDocuments([...documents, { id: id, name: parsedData["name"] }]);
       navigate(`/documents/${id}`);
       return res.data;
