@@ -454,7 +454,9 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
         event.preventDefault();
         const isList = LIST_TYPES.includes(editor.getFragment()[0].type);
         const isChecklist = editor.getFragment()[0].type === "check-list";
+
         if (isList) {
+          // digging in the editor object to get list length
           const listLength =
             editor.children[editor.selection.anchor.path[0]].children[
               editor.selection.anchor.path[1]
@@ -470,11 +472,13 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
             });
           }
         } else if (isChecklist) {
+          // digging in the editor object to get list length
           const listLength =
             editor.children[editor.selection.anchor.path[0]].children[
               editor.selection.anchor.path[1]
             ].text.length;
           const listType = editor.getFragment()[0].type;
+
           if (listLength === 0) {
             event.preventDefault();
             toggleBlock(editor, listType);
@@ -557,16 +561,18 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
       const isAstChange = editor.operations.some(
         (op) => "set_selection" !== op.type
       );
+
       if (isAstChange) {
-        const content = JSON.stringify(newValue);
-        const name = editor.children[0].children[0].text;
+        let content = JSON.stringify(newValue);
+        let name = editor.children[0].children[0].text;
         sessionStorage.setItem(documentId, content);
-        const config = {
+        let config = {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
         };
+
         if (documentName !== name) {
           updateSidebarArray(name);
           setDocumentName(name);
@@ -595,13 +601,13 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
     async (e) => {
       try {
         e.preventDefault();
-        var config = {
+        let config = {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
         };
-        var res = await axios.post(
+        let res = await axios.post(
           `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}/share`,
           {
             email: sharedEmailFromUser,
@@ -635,13 +641,13 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
       try {
         let target = e.target.checked;
         console.log(target);
-        var config = {
+        let config = {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
         };
-        var res = await axios.post(
+        let res = await axios.post(
           `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}/share`,
           {
             email: localStorage.getItem("ownerEmail"),

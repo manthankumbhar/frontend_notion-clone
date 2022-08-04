@@ -33,10 +33,10 @@ export default function PublicDocument() {
   }, [documentId, editor, content]);
 
   useEffect(() => {
-    var getData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        var res = await axios.get(
+        let res = await axios.get(
           `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
           {
             headers: {
@@ -44,9 +44,9 @@ export default function PublicDocument() {
             },
           }
         );
-        var parsedData = JSON.parse(res.data)["data"];
+        let parsedData = JSON.parse(res.data)["data"];
         if (parsedData === null) {
-          var data = [
+          let data = [
             {
               type: "heading-one",
               children: [{ text: "" }],
@@ -67,7 +67,7 @@ export default function PublicDocument() {
         navigate("/error");
       }
     };
-    getData();
+    fetchData();
   }, [navigate, documentId, editor]);
 
   const menuFocus = createRef();

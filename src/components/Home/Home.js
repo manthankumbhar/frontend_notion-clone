@@ -9,7 +9,7 @@ import { CircularProgress } from "@mui/material";
 
 export default function Home() {
   const navigate = useNavigate();
-  var { id } = useParams();
+  let { id } = useParams();
   const [documentsArray, setDocumentsArray] = useState([]);
   const [sharedDocumentsArray, setSharedDocumentsArray] = useState([]);
   const [documentId, setdocumentId] = useState("");
@@ -23,31 +23,32 @@ export default function Home() {
     async function documentsArray() {
       try {
         setLoading(true);
-        var userId = await decodeToken(accessToken)["user_id"];
-        var config = {
+        let userId = await decodeToken(accessToken)["user_id"];
+        let config = {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
         };
-        var res = await axios.get(
+        let res = await axios.get(
           `${process.env.REACT_APP_SERVER_LINK}/documents?user_id=${userId}`,
           config
         );
+
         if (res.data["documents"].length === 0) {
-          var config_2 = {
+          let config_2 = {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${accessToken}`,
             },
           };
-          var res_2 = await axios.post(
+          let res_2 = await axios.post(
             `${process.env.REACT_APP_SERVER_LINK}/documents`,
             {},
             config_2
           );
-          var parsedData = JSON.parse(res_2.data);
-          var id_2 = parsedData["id"];
+          let parsedData = JSON.parse(res_2.data);
+          let id_2 = parsedData["id"];
           navigate(`/documents/${id_2}`);
           return res_2.data;
         }
@@ -55,10 +56,13 @@ export default function Home() {
         setSharedDocumentsArray(res.data["shared_documents"]);
         let documents = [];
         let shared_documents = [];
+
+        // mapping and pushing ids to array to check if the id exists
         await res.data["documents"].map((x) => documents.push(x["id"]));
         await res.data["shared_documents"].map((x) =>
           shared_documents.push(x["id"])
         );
+
         if (documents.includes(id)) {
           setdocumentId(id);
           navigate(`/documents/${id}`);
@@ -82,10 +86,11 @@ export default function Home() {
 
   const updateSidebarArray = useCallback(
     (data) => {
-      var currentDocument = documentsArray.find((x) => x.id === documentId);
-      var currrentSharedDocument = sharedDocumentsArray.find(
+      let currentDocument = documentsArray.find((x) => x.id === documentId);
+      let currrentSharedDocument = sharedDocumentsArray.find(
         (x) => x.id === documentId
       );
+
       if (currentDocument) {
         currentDocument.name = data;
         setDocumentsArray([...documentsArray]);
