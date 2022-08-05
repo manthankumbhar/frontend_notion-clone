@@ -27,59 +27,11 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    setLoading(true);
-    editor.children = JSON.parse(sessionStorage.getItem(documentId)) || [
-      {
-        type: "heading-one",
-        children: [{ text: "" }],
-      },
-    ];
-    setLoading(false);
-  }, [documentId, editor, content]);
   const accessToken = localStorage.accessToken;
+
   if (accessToken === "" || accessToken === null || accessToken === undefined) {
     navigate("/error");
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        let res = await axios.get(
-          `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        let parsedData = JSON.parse(res.data)["data"];
-        if (parsedData === null) {
-          let data = [
-            {
-              type: "heading-one",
-              children: [{ text: "" }],
-            },
-          ];
-          sessionStorage.setItem(`${documentId}`, JSON.stringify(data));
-          setContent(data);
-          setLoading(false);
-          return data;
-        } else {
-          sessionStorage.setItem(`${documentId}`, parsedData);
-          setContent(parsedData);
-          setLoading(false);
-          return parsedData;
-        }
-      } catch (error) {
-        setLoading(false);
-        navigate("/error");
-      }
-    };
-    fetchData();
-  }, [accessToken, documentId, navigate]);
 
   const LIST_TYPES = useMemo(() => ["numbered-list", "bulleted-list"], []);
   const [showMenu, setShowMenu] = useState(false);
@@ -141,6 +93,57 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   useEffect(() => {
     menuRef.current?.focus();
   }, [menuRef]);
+
+  useEffect(() => {
+    setLoading(true);
+    editor.children = JSON.parse(sessionStorage.getItem(documentId)) || [
+      {
+        type: "heading-one",
+        children: [{ text: "" }],
+      },
+    ];
+    setLoading(false);
+  }, [documentId, editor, content]);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      let res = await axios.get(
+        `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      let parsedData = JSON.parse(res.data)["data"];
+      if (parsedData === null) {
+        let data = [
+          {
+            type: "heading-one",
+            children: [{ text: "" }],
+          },
+        ];
+        sessionStorage.setItem(`${documentId}`, JSON.stringify(data));
+        setContent(data);
+        setLoading(false);
+        return data;
+      } else {
+        sessionStorage.setItem(`${documentId}`, parsedData);
+        setContent(parsedData);
+        setLoading(false);
+        return parsedData;
+      }
+    } catch (error) {
+      setLoading(false);
+      navigate("/error");
+    }
+  }, [accessToken, documentId, navigate]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const headingOneElement = (props) => (
     <h1 {...props.attributes}>{props.children}</h1>
@@ -261,6 +264,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
     if (leaf.hyperLink) {
       children = (
         <a
+          // have to dig into children and find the text properly
           href={
             children.props.leaf.text.includes("http")
               ? `${children.props.leaf.text}`
@@ -299,6 +303,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
 
   const toggleMark = useCallback((editor, format) => {
     const isActive = isMarkActive(editor, format);
+
     if (isActive) {
       Editor.removeMark(editor, format);
     } else {
@@ -319,6 +324,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
           LIST_TYPES.includes(n.type),
         split: true,
       });
+
       const newProperties = {
         type: isActive ? "paragraph" : isList ? "list-item" : format,
       };
@@ -340,6 +346,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
   const getCoordinates = () => {
     let x, y;
     const selection = window.getSelection();
+
     if (selection.rangeCount !== 0) {
       const range = selection.getRangeAt(0).cloneRange();
       range.collapse(false);
@@ -462,15 +469,16 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
               editor.selection.anchor.path[1]
             ].children[0].text.length;
           const listType = editor.getFragment()[0].type;
-          if (listLength === 0) {
-            event.preventDefault();
-            toggleBlock(editor, listType);
-          } else {
+
+          if (listLength !== 0) {
             return Transforms.insertNodes(editor, {
               type: "list-item",
               children: [{ text: "" }],
             });
           }
+
+          event.preventDefault();
+          toggleBlock(editor, listType);
         } else if (isChecklist) {
           // digging in the editor object to get list length
           const listLength =
@@ -479,16 +487,16 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
             ].text.length;
           const listType = editor.getFragment()[0].type;
 
-          if (listLength === 0) {
-            event.preventDefault();
-            toggleBlock(editor, listType);
-          } else {
+          if (listLength !== 0) {
             return Transforms.insertNodes(editor, {
               type: "check-list",
               children: [{ text: "" }],
               checked: false,
             });
           }
+
+          event.preventDefault();
+          toggleBlock(editor, listType);
         } else {
           Transforms.insertNodes(editor, {
             type: "paragraph",
@@ -500,12 +508,14 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
       if (event.key === "Backspace") {
         const isList = LIST_TYPES.includes(editor.getFragment()[0].type);
         const isChecklist = editor.getFragment()[0].type === "check-list";
+
         if (isList) {
           const listLength =
             editor.children[editor.selection.anchor.path[0]].children[
               editor.selection.anchor.path[1]
             ].children[0].text.length;
           const listType = editor.getFragment()[0].type;
+
           if (listLength === 0) {
             event.preventDefault();
             toggleBlock(editor, listType);
@@ -514,6 +524,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
           const checklistLength =
             editor.children[editor.selection.anchor.path[0]].children[0].text
               .length;
+
           if (checklistLength === 0) {
             event.preventDefault();
             Transforms.setNodes(editor, {
@@ -581,13 +592,14 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
             { data: content, name: name },
             config
           );
-        } else {
-          axios.post(
-            `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
-            { data: content },
-            config
-          );
+          return;
         }
+
+        axios.post(
+          `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
+          { data: content },
+          config
+        );
       }
     },
     [documentId, editor, accessToken, updateSidebarArray, documentName]
@@ -614,23 +626,24 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
           },
           config
         );
+
         if (res.status === 200) {
           setOpenSnackbar(true);
           setsnackbarSeverity("success");
           setSnackbarMessage("Document shared.");
         }
       } catch (error) {
+        setOpenSnackbar(true);
+        setsnackbarSeverity("error");
+
         if (error.response.status === 403) {
-          setOpenSnackbar(true);
-          setsnackbarSeverity("error");
           setSnackbarMessage(
             "You're not the owner of this document, so can't share it."
           );
-        } else {
-          setOpenSnackbar(true);
-          setsnackbarSeverity("error");
-          setSnackbarMessage("Couldn't share, please try again");
+          return;
         }
+
+        setSnackbarMessage("Couldn't share, please try again");
       }
     },
     [accessToken, documentId, sharedEmailFromUser]
@@ -655,6 +668,7 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
           },
           config
         );
+
         if (res.status === 200) {
           setPublicSharing(target);
           setOpenSnackbar(true);
@@ -662,17 +676,17 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
           setSnackbarMessage("Document sharing changed.");
         }
       } catch (error) {
+        setOpenSnackbar(true);
+        setsnackbarSeverity("error");
+
         if (error.response.status === 403) {
-          setOpenSnackbar(true);
-          setsnackbarSeverity("error");
           setSnackbarMessage(
             "You're not the owner of this document, so can't share it."
           );
-        } else {
-          setOpenSnackbar(true);
-          setsnackbarSeverity("error");
-          setSnackbarMessage("Couldn't share, please try again");
+          return;
         }
+
+        setSnackbarMessage("Couldn't share, please try again");
       }
     },
     [accessToken, documentId]
