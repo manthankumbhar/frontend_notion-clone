@@ -21,6 +21,7 @@ export default function PublicDocument() {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     setLoading(true);
     editor.children = JSON.parse(sessionStorage.getItem(documentId)) || [
@@ -32,43 +33,44 @@ export default function PublicDocument() {
     setLoading(false);
   }, [documentId, editor, content]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        let res = await axios.get(
-          `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        let parsedData = JSON.parse(res.data)["data"];
-        if (parsedData === null) {
-          let data = [
-            {
-              type: "heading-one",
-              children: [{ text: "" }],
-            },
-          ];
-          sessionStorage.setItem(`${documentId}`, JSON.stringify(data));
-          setContent(data);
-          setLoading(false);
-          return data;
-        } else {
-          sessionStorage.setItem(`${documentId}`, parsedData);
-          setContent(parsedData);
-          setLoading(false);
-          return parsedData;
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      let res = await axios.get(
+        `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      } catch (error) {
+      );
+      let parsedData = JSON.parse(res.data)["data"];
+      if (parsedData === null) {
+        let data = [
+          {
+            type: "heading-one",
+            children: [{ text: "" }],
+          },
+        ];
+        sessionStorage.setItem(`${documentId}`, JSON.stringify(data));
+        setContent(data);
         setLoading(false);
-        navigate("/error");
+        return data;
+      } else {
+        sessionStorage.setItem(`${documentId}`, parsedData);
+        setContent(parsedData);
+        setLoading(false);
+        return parsedData;
       }
-    };
+    } catch (error) {
+      setLoading(false);
+      navigate("/error");
+    }
+  }, [navigate, documentId]);
+
+  useEffect(() => {
     fetchData();
-  }, [navigate, documentId, editor]);
+  }, [fetchData]);
 
   const menuFocus = createRef();
 
@@ -180,6 +182,7 @@ export default function PublicDocument() {
     if (leaf.hyperLink) {
       children = (
         <a
+          // have to dig into children and find the text properly
           href={
             children.props.leaf.text.includes("http")
               ? `${children.props.leaf.text}`
