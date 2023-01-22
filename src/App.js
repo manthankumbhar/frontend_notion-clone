@@ -6,12 +6,14 @@ import Signup from "components/Signup/Signup";
 import PrivateRoute from "hoc/PrivateRoute";
 import Error from "components/Error/Error";
 import PublicDocument from "components/PublicDocument/PublicDocument";
+import TemporaryHome from "./components/TemporaryHome";
 
 export default function App() {
   return (
     <div className="App">
       <Routes>
-        <Route exact path="/" element={<Login />} />
+        <Route exact path="/" element={<TemporaryHome />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/documents" element={<PrivateRoute />}>
           <Route path="" element={<Home />} />
