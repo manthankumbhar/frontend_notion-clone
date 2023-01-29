@@ -12,14 +12,14 @@ export default function App() {
   return (
     <div className="App">
       <Routes>
-        <Route exact path="/" element={<TemporaryHome />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/documents" element={<PrivateRoute />}>
           <Route path="" element={<Home />} />
           <Route path=":id" element={<Home />} />
         </Route>
         <Route path="/shared/:id" element={<PublicDocument />} />
+        <Route exact path="/maintenance" element={<TemporaryHome />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </div>
