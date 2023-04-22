@@ -21,12 +21,14 @@ import { CircularProgress, FormControlLabel, Switch } from "@mui/material";
 import { withHistory } from "slate-history";
 import isHotkey from "is-hotkey";
 import SnackBar from "components/SnackBar/SnackBar";
+import { debounce } from "lodash";
 
 export default function SlateEditor({ documentId, updateSidebarArray }) {
   const navigate = useNavigate();
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [debouncing, setDebouncing] = useState(false);
   const accessToken = localStorage.accessToken;
 
   if (accessToken === "" || accessToken === null || accessToken === undefined) {
@@ -574,9 +576,9 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
       );
 
       if (isAstChange) {
-        let content = JSON.stringify(newValue);
-        let name = editor.children[0].children[0].text;
-        sessionStorage.setItem(documentId, content);
+        let updatedContent = JSON.stringify(newValue);
+        let name = editor?.children[0]?.children[0]?.text;
+        sessionStorage.setItem(documentId, updatedContent);
         let config = {
           headers: {
             "Content-Type": "application/json",
@@ -589,20 +591,37 @@ export default function SlateEditor({ documentId, updateSidebarArray }) {
           setDocumentName(name);
           axios.post(
             `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
-            { data: content, name: name },
+            { data: updatedContent, name: name },
             config
           );
           return;
         }
 
-        axios.post(
-          `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
-          { data: content },
-          config
-        );
+        // function to handle continuous updates
+        const debouncedCall = debounce(() => {
+          setDebouncing(false);
+          axios.post(
+            `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
+            { data: updatedContent },
+            config
+          );
+        }, 3000);
+
+        // checking if the function is already called using a state
+        if (!debouncing) {
+          setDebouncing(true);
+          debouncedCall();
+        }
       }
     },
-    [documentId, editor, accessToken, updateSidebarArray, documentName]
+    [
+      documentId,
+      editor,
+      accessToken,
+      updateSidebarArray,
+      documentName,
+      debouncing,
+    ]
   );
 
   const closeSharingMenu = useCallback(() => {
