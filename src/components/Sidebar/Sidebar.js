@@ -76,12 +76,12 @@ export default function Sidebar({ documentsArray, sharedDocumentsArray }) {
               : item.name}
           </div>
         </Link>
-        <img
+        {/* <img
           src={trashIcon}
           alt="trash"
           className="sidebar__menu--options-delete"
           onClick={() => deleteDocument(item.id)}
-        />
+        /> */}
       </div>
     );
   });
