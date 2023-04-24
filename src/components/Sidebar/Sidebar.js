@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { CircularProgress } from "@mui/material";
-import trashIcon from "public/assets/trash.svg";
+// import trashIcon from "public/assets/trash.svg";
 
 export default function Sidebar({ documentsArray, sharedDocumentsArray }) {
   const navigate = useNavigate();
@@ -30,32 +30,32 @@ export default function Sidebar({ documentsArray, sharedDocumentsArray }) {
     setSharedDocuments(sharedDocumentsArray);
   }, [documentsArray, sharedDocumentsArray]);
 
-  const deleteDocument = useCallback(
-    async (documentId) => {
-      let message = "Are you sure you want to delete the document?";
-      if (window.confirm(message) === true) {
-        try {
-          let config = {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          };
-          let res = await axios.delete(
-            `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
-            {},
-            config
-          );
-          if (res.status === "200") {
-            console.log("success");
-          }
-        } catch (err) {
-          console.log(err.message);
-        }
-      }
-    },
-    [accessToken]
-  );
+  // const deleteDocument = useCallback(
+  //   async (documentId) => {
+  //     let message = "Are you sure you want to delete the document?";
+  //     if (window.confirm(message) === true) {
+  //       try {
+  //         let config = {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${accessToken}`,
+  //           },
+  //         };
+  //         let res = await axios.delete(
+  //           `${process.env.REACT_APP_SERVER_LINK}/documents/${documentId}`,
+  //           {},
+  //           config
+  //         );
+  //         if (res.status === "200") {
+  //           console.log("success");
+  //         }
+  //       } catch (err) {
+  //         console.log(err.message);
+  //       }
+  //     }
+  //   },
+  //   [accessToken]
+  // );
 
   const documentOptions = documents.map((item, key) => {
     let url = document.URL;
